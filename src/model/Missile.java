@@ -33,7 +33,7 @@ public class Missile extends MovingEntity {
 	public boolean isPressed;
 	
 	//time for engine to burnout
-	public static final long BURNOUT = 5;
+	public static final long BURNOUT = 10;
 	
 	//total time elapsed in nanoseconds
 	private double totalTime;
@@ -193,6 +193,8 @@ public class Missile extends MovingEntity {
 			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
 			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
 		}
+	
+		
 		
 	}
 
