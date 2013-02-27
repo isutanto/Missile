@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
  */
 public class Missile extends MovingEntity {
 	
-	public static final int BLAST_RADIUS = 54;
+	public static final int BLAST_RADIUS = 85;
 	private SteeringBehaviors steering;
 	public Vector2D gForce;
 	
@@ -33,7 +33,7 @@ public class Missile extends MovingEntity {
 	public boolean isPressed;
 	
 	//time for engine to burnout
-	public static final long BURNOUT = 100;
+	public static final long BURNOUT = 12;
 	
 	//total time elapsed in nanoseconds
 	private double totalTime;
@@ -339,6 +339,11 @@ public class Missile extends MovingEntity {
 
 	public void dragMissile() {
 		position.x = MouseInfo.getPointerInfo().getLocation().x;		
+	}
+	
+	public State getMissileState()
+	{
+		return state;
 	}
 
 }

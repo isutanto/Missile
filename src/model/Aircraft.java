@@ -73,7 +73,7 @@ public class Aircraft extends MovingEntity {
 		
 		//double distance = this.position.distance(missile.pos());
 		
-		if(this.position.distance(missile.pos()) < 200 && missile.state != State.EXPLODE)//800)
+		if(this.position.distance(missile.pos()) < 250 && missile.state != State.EXPLODE)//800)
 		{
 			steering.evade(missile);
 			//update velocity when doing the evade or flee   need to improve the evasion technique
