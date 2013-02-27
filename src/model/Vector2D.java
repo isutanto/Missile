@@ -166,6 +166,18 @@ public class Vector2D {
 		public Vector2D sub(final Vector2D v2) {
 			return new Vector2D(x - v2.x, y - v2.y);
 		}
+// ---- for evasion --------------		
+		public Vector2D evasionDown(final Vector2D v2, double gear)
+		{
+			
+			return new Vector2D(x + (gear*v2.x), y - (gear*v2.y));
+		}
+		
+		public Vector2D evasionUp(final Vector2D v2, double gear)
+		{
+			return new Vector2D(x + (gear*v2.x), y + (gear*v2.y));
+		}
+// ------- for evasion ----------------		
 		
 		public Vector2D mul(double scalar) {
 			return new Vector2D(x * scalar, y * scalar);

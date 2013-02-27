@@ -2,6 +2,7 @@ package view;
 
 import controller.GameController;
 import model.GameWorldModel;
+import model.Missile;
 import model.Missile.Guidance;
 import model.ModelEvent;
 import model.Vector2D;

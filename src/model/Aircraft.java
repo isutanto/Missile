@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import model.Missile.State;
+
 public class Aircraft extends MovingEntity {
 
 	/**
@@ -13,6 +15,13 @@ public class Aircraft extends MovingEntity {
 	 */
 	private SteeringBehaviors steering;
 	public boolean isPressed;
+	
+	// Angle of maneuver for aircraft add on
+	/*
+	public double curAngle=0;	
+	public double desiredAngle;
+	*/
+	
 	
 	public Aircraft(Vector2D position,
 			double radius,
@@ -62,25 +71,40 @@ public class Aircraft extends MovingEntity {
 		
 		//Vector2D force = steering.calculate();
 		
-		double distance = this.position.distance(missile.pos());
+		//double distance = this.position.distance(missile.pos());
 		
-		/*if(this.position.distance(missile.pos()) < 800)
-			steering.evade(missile);	
+		if(this.position.distance(missile.pos()) < 200 && missile.state != State.EXPLODE)//800)
+		{
+			steering.evade(missile);
+			//update velocity when doing the evade or flee   need to improve the evasion technique
+			velocity = steering.getMyTarget().velocity;
+			if ((this.pos().y - missile.pos().y) > 0 )
+				position = position.evasionDown(velocity,this.maxForce());
+			else
+				position = position.evasionUp(velocity,this.maxForce());
+		}
+				
 		else
-			steering.wander();*/
+		{
+			steering.wander();
+			position = position.add(velocity);
+		}
 		
 		
 		//calculate the acceleration
 		//Vector2D accel = force.div(mass);
 
 		//update the velocity
-		//velocity = velocity.add(accel);
+		//velocity = steering.getMyTarget().velocity;
 			
 		//make sure vehicle does not exceed maximum velocity per second
 		velocity.truncate(maxSpeed);
 
 		//update the position
-		position = position.add(velocity);
+		/*if ((this.pos().y - missile.pos().y) < 0 )
+		position = position.sub(velocity);
+		else
+			position = position.add(velocity);*/
 		
 		//if the vehicle has a non zero velocity the heading and side vectors must 
 		//be updated
