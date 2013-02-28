@@ -33,7 +33,11 @@ public class Missile extends MovingEntity {
 	public boolean isPressed;
 	
 	//time for engine to burnout
+<<<<<<< HEAD
 	public static final long BURNOUT = 12;
+=======
+	public static final long BURNOUT = 100; //t
+>>>>>>> 020ef9f1bd610140a9ee371de7a739c08da63e07
 	
 	//total time elapsed in nanoseconds
 	private double totalTime;
@@ -73,10 +77,10 @@ public class Missile extends MovingEntity {
 	private static final double Cx = 1; //drag coefficient
 	
 	//initial weight
-	private int G0;
+	private int G0; //initial mass of the missile
 	
 	//current weight
-	public int weight;
+	public double weight;
 	
 	public double curAngle=90;	
 	public double desiredAngle;
@@ -128,7 +132,7 @@ public class Missile extends MovingEntity {
 		calculateThrust();
 		calculateLift();
 		calculateDrag();
-		calculateWeight();
+		calculateWeight(totalTime);
 
 		
 		if(state == State.ACCEL){
@@ -233,7 +237,7 @@ public class Missile extends MovingEntity {
 	    return angle - 90; 
 	
 	}
-
+//Modify Weight Calculation:
 	private void calculateWeight() {
 		double percent;
 		if(position.y < 0)
@@ -259,6 +263,14 @@ public class Missile extends MovingEntity {
 		weight = (int) (G0*percent);
 		
 	}
+	private void calculateWeight(double dTime){
+		if(weight == 0){
+			weight = G0-((Gc/1000000000L) * dTime);
+		}
+		else if(state == State.ACCEL && weight >20){
+			weight = G0-((Gc/1000000000L) * dTime);
+		}
+	}
 
 	private void updateState(double timeSeconds) {
 		if(timeSeconds < BURNOUT)
@@ -272,11 +284,11 @@ public class Missile extends MovingEntity {
 	}
 
 	private void calculateLift() {
-		lift = velocity.sq();
-		lift = lift.mul(rho);
-		lift = lift.div(2);
-		lift = lift.mul(Sb);
-		lift = lift.mul(Cy);
+		lift = velocity.sq();	// V sqr
+		lift = lift.mul(rho);	// p * V2
+		lift = lift.div(2);		// (p * V2)/2
+		lift = lift.mul(Sb);	// ((p * V2)/2)S
+		lift = lift.mul(Cy);	// (((p * V2)/2)S)Cy
 		lift.y = -lift.y;
 	}
 	
