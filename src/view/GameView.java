@@ -133,7 +133,7 @@ int prevposx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x;
 
 int prevposy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y;
 
-if (Missile.getMissileState()!= Missile.State.EXPLODE)
+if (Missile.getState()!= Missile.State.EXPLODE)
 gameUpdate();
 
 int curposx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x;

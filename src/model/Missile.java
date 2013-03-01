@@ -22,7 +22,7 @@ public class Missile extends MovingEntity {
 	public enum State {
 		ACCEL, FREEFALL, GROUND, EXPLODE
 	}
-	public State state;
+	public static State state;
 	
 	public enum Guidance{
 		PROPOTIONAL, PURSUIT, PARALLEL, NONE
@@ -33,11 +33,9 @@ public class Missile extends MovingEntity {
 	public boolean isPressed;
 	
 	//time for engine to burnout
-<<<<<<< HEAD
+
 	public static final long BURNOUT = 12;
-=======
-	public static final long BURNOUT = 100; //t
->>>>>>> 020ef9f1bd610140a9ee371de7a739c08da63e07
+
 	
 	//total time elapsed in nanoseconds
 	private double totalTime;
@@ -238,7 +236,7 @@ public class Missile extends MovingEntity {
 	
 	}
 //Modify Weight Calculation:
-	private void calculateWeight() {
+	/*private void calculateWeight() {
 		double percent;
 		if(position.y < 0)
 			percent = .90;
@@ -262,7 +260,7 @@ public class Missile extends MovingEntity {
 			percent = 1.0;
 		weight = (int) (G0*percent);
 		
-	}
+	}*/
 	private void calculateWeight(double dTime){
 		if(weight == 0){
 			weight = G0-((Gc/1000000000L) * dTime);
@@ -354,6 +352,11 @@ public class Missile extends MovingEntity {
 	}
 	
 	public State getMissileState()
+	{
+		return state;
+	}
+	
+	public static State getState()
 	{
 		return state;
 	}
