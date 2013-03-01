@@ -177,6 +177,11 @@ public class Vector2D {
 		{
 			return new Vector2D(x + (gear*v2.x), y + (gear*v2.y));
 		}
+		
+		public Vector2D evasionLoop(final Vector2D v2, double gear,double angle)
+		{
+			return new Vector2D(x + (gear*v2.x * Math.cos(Math.toRadians(angle))), y + (gear*v2.y * Math.sin(Math.toRadians(angle))));
+		}
 // ------- for evasion ----------------		
 		
 		public Vector2D mul(double scalar) {

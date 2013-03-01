@@ -2,6 +2,7 @@ package view;
 
 import controller.GameController;
 import model.GameWorldModel;
+import model.Missile;
 import model.Missile.Guidance;
 import model.ModelEvent;
 import model.Vector2D;
@@ -132,6 +133,7 @@ int prevposx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x;
 
 int prevposy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y;
 
+if (Missile.getState()!= Missile.State.EXPLODE)
 gameUpdate();
 
 int curposx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x;
@@ -238,7 +240,7 @@ BufferedImage aircraftImage = ((GameWorldModel)getModel()).getAircraft().image;
 
 //draw view
 
-int left = camx / 100 - 1;
+int left = camx / 100 + 10;
 int bottom = (camy / 100) - 3 ;
 
 int remx = camx % 100;
@@ -248,7 +250,7 @@ int remy = camy % 100;
 for(int i = 0; i < 12; i++)
 for(int j = 0; j < 7; j++)
 {
-dbg.drawImage(((GameWorldModel)getModel()).getMap(i + left, j + bottom), 15 - remx + (i * 100), 425 + remy - (j * 100) , null);
+dbg.drawImage(((GameWorldModel)getModel()).getMap(i + left, j + bottom), 0 - remx + (i * 100), 425 + remy - (j * 100) , null);
 }
 
 

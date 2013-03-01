@@ -22,7 +22,7 @@ public class Missile extends MovingEntity {
 	public enum State {
 		ACCEL, FREEFALL, GROUND, EXPLODE
 	}
-	public State state;
+	public static State state;
 	
 	public enum Guidance{
 		PROPOTIONAL, PURSUIT, PARALLEL, NONE
@@ -33,7 +33,9 @@ public class Missile extends MovingEntity {
 	public boolean isPressed;
 	
 	//time for engine to burnout
+
 	public static final long BURNOUT = 12;
+
 	
 	//total time elapsed in nanoseconds
 	private double totalTime;
@@ -73,10 +75,10 @@ public class Missile extends MovingEntity {
 	private static final double Cx = 1; //drag coefficient
 	
 	//initial weight
-	private int G0;
+	private int G0; //initial mass of the missile
 	
 	//current weight
-	public int weight;
+	public double weight;
 	
 	public double curAngle=90;	
 	public double desiredAngle;
@@ -128,7 +130,7 @@ public class Missile extends MovingEntity {
 		calculateThrust();
 		calculateLift();
 		calculateDrag();
-		calculateWeight();
+		calculateWeight(totalTime);
 
 		
 		if(state == State.ACCEL){
@@ -233,8 +235,8 @@ public class Missile extends MovingEntity {
 	    return angle - 90; 
 	
 	}
-
-	private void calculateWeight() {
+//Modify Weight Calculation:
+	/*private void calculateWeight() {
 		double percent;
 		if(position.y < 0)
 			percent = .90;
@@ -258,6 +260,14 @@ public class Missile extends MovingEntity {
 			percent = 1.0;
 		weight = (int) (G0*percent);
 		
+	}*/
+	private void calculateWeight(double dTime){
+		if(weight == 0){
+			weight = G0-((Gc/1000000000L) * dTime);
+		}
+		else if(state == State.ACCEL && weight >20){
+			weight = G0-((Gc/1000000000L) * dTime);
+		}
 	}
 
 	private void updateState(double timeSeconds) {
@@ -272,11 +282,11 @@ public class Missile extends MovingEntity {
 	}
 
 	private void calculateLift() {
-		lift = velocity.sq();
-		lift = lift.mul(rho);
-		lift = lift.div(2);
-		lift = lift.mul(Sb);
-		lift = lift.mul(Cy);
+		lift = velocity.sq();	// V sqr
+		lift = lift.mul(rho);	// p * V2
+		lift = lift.div(2);		// (p * V2)/2
+		lift = lift.mul(Sb);	// ((p * V2)/2)S
+		lift = lift.mul(Cy);	// (((p * V2)/2)S)Cy
 		lift.y = -lift.y;
 	}
 	
@@ -342,6 +352,11 @@ public class Missile extends MovingEntity {
 	}
 	
 	public State getMissileState()
+	{
+		return state;
+	}
+	
+	public static State getState()
 	{
 		return state;
 	}
