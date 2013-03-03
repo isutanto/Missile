@@ -74,8 +74,11 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  private Image dbImage = null;
 	  
 	  //coordinates for center of camera.
-	  int camx = 100;
-	  int camy = 440;
+	  int camx;
+	  int camy;
+	  
+	  int xdif;
+	  int ydif;
 	  
 	
 
@@ -113,7 +116,9 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  public void run()
 	  /* The frames of the animation are drawn inside the while loop. */
 	  {
-		  
+		camx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x - 100;
+		camy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y + 40;
+		
 		fps = 0;
 		lastFps = 0;
 	    long beforeTime, timeDiff, sleepTime;
@@ -138,8 +143,8 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 		 	
 			int curposy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y;
 			
-			int xdif = curposx - prevposx;
-			int ydif = curposy - prevposy;
+			xdif = curposx - prevposx;
+			ydif = curposy - prevposy;
 			
 			camx += xdif;
 			camy -= ydif;
@@ -188,6 +193,7 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	       gameUpdate();
 	        skips++;
 	      }
+	      
 		}
 	    System.exit(0); 
 	  } 
@@ -236,10 +242,10 @@ private void gameRender(int x, int y)
 	
 	
 	
-	//draw top view
+	//draw view
 	
-	int left = camx / 100 - 1; //1
-	int bottom = (camy / 100) - 3; //4
+	int left = camx / 100 + 5; 
+	int bottom = (camy / 100) - 3 ; 
 	
 	int remx = camx % 100;
 	int remy = camy % 100;
@@ -248,10 +254,11 @@ private void gameRender(int x, int y)
 		for(int i = 0; i < 12; i++)
 			for(int j = 0; j < 7; j++)
 			{
-				//                                                   2          3              115             325
-				//                                                   1          2              15              425
-				dbg.drawImage(((GameWorldModel)getModel()).getMap(i + left, j + bottom), 15 - remx + (i * 100), 425 + remy - (j * 100) , null);
+				dbg.drawImage(((GameWorldModel)getModel()).getMap(i + left, j + bottom), -remx + (i * 100), 455 + remy - (j * 100) , null);
 			}
+		
+	
+	
 
 	//creating the AffineTransform instance 
 	AffineTransform affineTransform = new AffineTransform(); 
@@ -262,6 +269,7 @@ private void gameRender(int x, int y)
 		//((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
 	affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
 			PHEIGHT / 2 - missileImage.getHeight()); 
+	
 	//rotate with the anchor point as the mid of the image 
 	affineTransform.rotate(Math.toRadians(-((GameWorldModel)getModel()).getMissile().curAngle),  missileImage.getWidth()/2, missileImage.getHeight()/2); 
 	//draw the image using the AffineTransform 
@@ -311,22 +319,17 @@ private void gameRender(int x, int y)
  
   
   
-  //draw trail line
- /* for(int i = 0; i < numPositions; i++)
-  {
-      dbg.drawLine(cameraPositions[i][0],cameraPositions[i][1],cameraPositions[i+1][0],cameraPositions[i+1][1]);
-  }
-  */
+//draw trail
   
- //Needs work now that scene moves
-/*  dbg.setColor(Color.RED);
+
+dbg.setColor(Color.RED);
 for (int i = 0; i < ((GameWorldModel)getModel()).getMissile().positionArray.size() - 1; i++){
-	  dbg.drawLine((int)((GameWorldModel)getModel()).getMissile().positionArray.get(i).x,
-			  (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i).y, 
-			  (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i + 1).x,
-			  (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i + 1).y);
+	  dbg.drawLine(400 -camx + (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i).x,
+			-600 + camy + (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i).y, 
+			 400 -camx  + (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i + 1).x,
+			 -600 + camy + (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i + 1).y);
  }
- */
+ 
 
   //FPS
   dbg.setColor(Color.BLACK);

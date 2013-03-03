@@ -30,8 +30,8 @@ public class GameWorldModel extends AbstractModel {
 	BufferedImage kaboom;
 	public long lastCall;
 	private int MAP[][]; 
-	private int MAPX = 100;
-	private int MAPY = 100;
+	private int MAPX = 20;
+	private int MAPY = 20;
 	Random randomGenerator;
 	
 	
@@ -43,14 +43,14 @@ public class GameWorldModel extends AbstractModel {
 	for(int i = 0; i < MAPX; i++)
 	{ 
 	   MAP[i][4] = 6;
-	   MAP[i][5] = MAP[i][6] = 1;
+	   MAP[i][5] = 1;
 	   for(int j = 3; j >= 0; j--)
 	   {
 		  MAP[i][j] = 7;   
 	   }
 	}
 	for(int i = 0; i < MAPX; i++)
-		for(int j = 7; j < MAPY; j++)
+		for(int j = 6; j < MAPY; j++)
 		{
 			int d = randomGenerator.nextInt(10);
 			if(d >= 1)
@@ -61,7 +61,7 @@ public class GameWorldModel extends AbstractModel {
 	
 			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
 	        aircraft = new Aircraft(new Vector2D (400, -1000), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-			missile = new Missile(new Vector2D (200, 440), 5, new Vector2D(0, 0), 2, new Vector2D (0, 0), 5000, 
+			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 2, new Vector2D (0, 0), 5000, 
 					new Vector2D(0, 0), 1, 2, aircraft);
 			
 			aircraft.getSteering().setTarget(missile); 
@@ -132,8 +132,12 @@ public Aircraft getAircraft(){
 }*/
 
 public Image getMap(int i,int j) {
-	
+	if(i >= MAPX || j >= MAPY)
+	{
+		resizeMap();
+	}
 	int imageNumber = MAP[i][j];
+	
 	
 	switch (imageNumber) {
 	case 1: return i1;
@@ -147,7 +151,32 @@ public Image getMap(int i,int j) {
 	}
 	
 }
-
+public void resizeMap()
+{
+   System.out.print("Resizing map...");
+   MAPX *= 2;
+   MAPY *= 2;
+   System.out.println(": New size = " + MAPX + " x " + MAPY + ".");
+   
+   int temp[][] = new int[MAPX][MAPY];
+   for(int i = 0; i < MAPX/2; i++)
+	   for(int j = 0; j < MAPY/2; j++)
+		   temp[i][j] = MAP[i][j];
+   randomGenerator = new Random();
+   for(int i = MAPX/2; i < MAPX; i++)
+   {
+	   for(int j = MAPY/2; j < MAPY; j++)
+	   {
+		   int d = randomGenerator.nextInt(10);
+		   if(d >= 1)
+			  temp[i][j] = 1;
+		   else
+		      temp[i][j] = 2 + randomGenerator.nextInt(4);
+	   }   
+   }
+   
+   MAP = temp;
+}
 public void update() {
 	
 	missile.update(aircraft, System.nanoTime() - lastCall);

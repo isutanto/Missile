@@ -168,7 +168,7 @@ public class Missile extends MovingEntity {
 		
 		if(positionTimeCount < timeSeconds){ //add a point to be drawn every .5 seconds
 			positionTimeCount += .5;
-			positionArray.add(new Vector2D(position));
+		  	positionArray.add(new Vector2D(position));
 		}
 		
 		
@@ -197,6 +197,7 @@ public class Missile extends MovingEntity {
 		
 		
 	}
+	
 
 	private void getDesiredAngle() {
 		
