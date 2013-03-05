@@ -19,13 +19,18 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
+
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;  
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.Action;
+
+import java.io.*;
 
 
 
@@ -55,8 +60,11 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  
 	  //Used for screen dragging.
 	  
-	  int mxLast;
-	  int myLast;
+	  private int mxLast;
+	  private int myLast;
+	  
+	  private boolean imageDumped = false;
+	  private boolean askForDump = false;
 	  	 
 	  
 	public boolean guidanceSelected;
@@ -96,16 +104,20 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 		super(model, controller); 
 		testPanel = new JPanel();
 		getContentPane().add(testPanel);
+		
+		/*testPanel.getInputMap().put(KeyStroke.getKeyStroke("F2"),
+	              "doSomething");
+		*/
 		testPanel.setPreferredSize( new Dimension(PWIDTH, PHEIGHT));
 		testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.LINE_AXIS));
 		//testPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 		//JScrollPane scrollBar=new JScrollPane(testPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
-		JScrollPane scrollBar=new JScrollPane(testPanel);  
+		//JScrollPane scrollBar=new JScrollPane(testPanel);  
 		
 		//scrollBar.setSize(PWIDTH,PHEIGHT);  
 	  //  scrollBar.setLocation(PWIDTH,0);  
 	   
-		this.getContentPane().add(scrollBar, BorderLayout.CENTER);    
+		//this.getContentPane().add(scrollBar, BorderLayout.CENTER);    
 		
 		
 	    setFocusable(true);
@@ -128,6 +140,9 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	    pack();
 	    setResizable(false);  
 	    setVisible(true);
+	    
+	   // this.requestFocusInWindow();
+	   
 	  }
 
 
@@ -241,6 +256,12 @@ private void paintScreen(){
 
 private void gameRender(int x, int y)
 {
+	if(!askForDump && ((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+	{
+		System.out.println("Click for image dump.");
+		askForDump = true;
+	}
+
 	if (dbImage == null){
 		dbImage = createImage(PWIDTH, PHEIGHT);
     if (dbImage == null) {
@@ -329,9 +350,6 @@ private void gameRender(int x, int y)
 	 aircraftPosx = aircraftPosx - missilePosx + 500;
 	 aircraftPosy = aircraftPosy - missilePosy + 250;
 	 
-	 System.out.println(missilePosx - camx);
-	 System.out.println(missilePosy + camy);
-	 
 	 if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
 		  affineTransform.setToTranslation(missilePosx - camx + 395,
 					missilePosy + camy - 583);
@@ -399,8 +417,6 @@ for (int i = 0; i < ((GameWorldModel)getModel()).getMissile().positionArray.size
   dbg.drawString("Weight: " + ((GameWorldModel)getModel()).getMissile().weight, 900, 445);
   dbg.drawString("Map Area: " + "(" + left + ", " + bottom + ", " + (left + 12) + ", " + (bottom + 7) + ")", 825, 460);
  // dbg.drawString("G-Force: " + (int) ((GameWorldModel)getModel()).getMissile().gForce.y, 900, 460);
-
- 
  
 }
 private void drawImage(Graphics dbg2, Image image, int x, int y){ 
@@ -529,6 +545,12 @@ public void resumeGame(){
 	@Override
 	public void mousePressed(MouseEvent me) {
 		
+		if(!imageDumped && ((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		{
+				dumpImage();
+				imageDumped = true;
+		}
+		
 	
 		if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
 		{
@@ -554,4 +576,44 @@ public void resumeGame(){
 		}
 	
 	}
+	public void dumpImage()
+	{
+		System.out.println("Dumping map image...");
+		int x = ((GameWorldModel)getModel()).getMapX();
+		int y = ((GameWorldModel)getModel()).getMapY();
+		
+		
+		
+		BufferedImage result = new BufferedImage(
+               x, y,
+                BufferedImage.TYPE_INT_RGB);
+         Graphics g = result.getGraphics();
+         for(int i = 0; i < x; i++)
+        	 for(int j = 0; j < y; j++)
+        	 {
+        		 BufferedImage bi = null;
+        		 try{
+        			 
+        		 String mapName = ((GameWorldModel)getModel()).getMapName(i,j);
+        		 bi = ImageIO.read(this.getClass().getResource(mapName));
+        		 }
+        		 catch (IOException e)
+        		 {
+        			 String s = e.getMessage();
+                	 System.out.println(s);
+        		 }
+        		 g.drawImage(bi, x, y, null);
+        	 }
+         try{
+         ImageIO.write(result,"gif",new File("result.gif"));
+         }
+         catch (IOException e)
+         {
+        	 String s = e.getMessage();
+        	 System.out.println(s);
+         }
+         System.out.println("Dump complete. Image located under vpproject folder.");
+         System.out.println("Drag mouse to move map.");
+	}
+	
 }

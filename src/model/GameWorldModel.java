@@ -110,9 +110,9 @@ public class GameWorldModel extends AbstractModel {
 				System.out.println("Can't find i6.gif!");
 			}
 			try {
-			    i7 = ImageIO.read(getClass().getResource("i7.png") );
+			    i7 = ImageIO.read(getClass().getResource("i7.gif") );
 			} catch (IOException e) {
-				System.out.println("Can't find i7.png!");
+				System.out.println("Can't find i7.gif!");
 			}
 			
 			lastCall = System.nanoTime();
@@ -148,6 +148,26 @@ public Image getMap(int i,int j) {
 	case 6: return i6;
 	case 7: return i7;
 	default: return i1;
+	}
+	
+}
+public String getMapName(int i,int j) {
+	if(i >= MAPX || j >= MAPY)
+	{
+		resizeMap();
+	}
+	int imageNumber = MAP[i][j];
+	
+	
+	switch (imageNumber) {
+	case 1: return "i1.gif";
+	case 2: return "i2.gif";
+	case 3: return "i3.gif";
+	case 4: return "i4.gif";
+	case 5: return "i5.gif";
+	case 6: return "i6.gif";
+	case 7: return "i7.gif";
+	default: return "i1.gif";
 	}
 	
 }
@@ -199,7 +219,7 @@ public void update() {
 		missile.position.setValue(new Vector2D(missile.position.x, GROUND.y));
 		missile.velocity.setValue(new Vector2D(0, 0));
 		missile.image = kaboom;
-		missile.state = Missile.State.EXPLODE;
+	    missile.state = Missile.State.EXPLODE;
 	}
 	
 	if(missile.position.distance(aircraft.position) <= 50){
@@ -213,4 +233,6 @@ public void update() {
 	lastCall = System.nanoTime();
 	
 }
+public int getMapX(){ return MAPX;}
+public int getMapY(){ return MAPY;}
 }
