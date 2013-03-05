@@ -3,6 +3,7 @@ package view;
 import controller.GameController;
 import model.GameWorldModel;
 import model.Missile.Guidance;
+import model.Missile.State;
 import model.ModelEvent;
 import model.Vector2D;
 
@@ -22,6 +23,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.JScrollPane;  
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -43,11 +45,18 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  private int fps;
 	  private long afterTime;
 	  
+	  boolean mouseAction = false;
+	  
 	  //public static final int GUIDANCE_Y = PHEIGHT/2;
 	  public static final int GUIDANCE_Y = 450;
 	  public static final int PURSUIT_X = 250;
 	  public static final int PROPORTIONAL_X = 500;
 	  public static final int PARALLEL_X = 750;
+	  
+	  //Used for screen dragging.
+	  
+	  int mxLast;
+	  int myLast;
 	  	 
 	  
 	public boolean guidanceSelected;
@@ -86,9 +95,19 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  {
 		super(model, controller); 
 		testPanel = new JPanel();
+		getContentPane().add(testPanel);
 		testPanel.setPreferredSize( new Dimension(PWIDTH, PHEIGHT));
 		testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.LINE_AXIS));
 		//testPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+		//JScrollPane scrollBar=new JScrollPane(testPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
+		JScrollPane scrollBar=new JScrollPane(testPanel);  
+		
+		//scrollBar.setSize(PWIDTH,PHEIGHT);  
+	  //  scrollBar.setLocation(PWIDTH,0);  
+	   
+		this.getContentPane().add(scrollBar, BorderLayout.CENTER);    
+		
+		
 	    setFocusable(true);
 	    requestFocus(); 
 	    addMouseListener(this);
@@ -251,7 +270,7 @@ private void gameRender(int x, int y)
 	int remy = camy % 100;
 	
 	
-		for(int i = 0; i < 12; i++)
+		for(int i = -1; i < 12; i++)
 			for(int j = 0; j < 7; j++)
 			{
 				dbg.drawImage(((GameWorldModel)getModel()).getMap(i + left, j + bottom), -remx + (i * 100), 455 + remy - (j * 100) , null);
@@ -265,36 +284,62 @@ private void gameRender(int x, int y)
 	//set the translation to the mid of the component 
 	//affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
 		//((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2); 
-	//affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
+	
+	
+   //affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
 		//((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
-	affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
-			PHEIGHT / 2 - missileImage.getHeight()); 
+	
+	/*if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
+				((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
+	
+	 */
+	 affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
+			PHEIGHT / 2 - missileImage.getHeight());
 	
 	//rotate with the anchor point as the mid of the image 
-	affineTransform.rotate(Math.toRadians(-((GameWorldModel)getModel()).getMissile().curAngle),  missileImage.getWidth()/2, missileImage.getHeight()/2); 
+		
+	 affineTransform.rotate(Math.toRadians(-((GameWorldModel)getModel()).getMissile().curAngle),  missileImage.getWidth()/2, missileImage.getHeight()/2); 
 	//draw the image using the AffineTransform 
 
 
 	Graphics2D g2d = (Graphics2D)dbg;
 
-	g2d.drawImage(missileImage, affineTransform, this); 
 	
-	 dbg.setColor(Color.YELLOW);
+	//g2d.drawImage(missileImage, affineTransform, this); 
+	
+	
+	//Not sure what this draws.
+	
+	/* dbg.setColor(Color.YELLOW);
 	  
 	  dbg.drawLine((int)
 			 	((GameWorldModel)getModel()).getMissile().getPosition().x , 
 		 		(int) ((GameWorldModel)getModel()).getMissile().getPosition().y,
 		 		(int) ((GameWorldModel)getModel()).getMissile().getPosition().x, 
 		 		(int) ((GameWorldModel)getModel()).getMissile().getPosition().y);
+		 		*/
 	  
-	 int misslePosx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x - missileImage.getWidth()/2;
-	 int misslePosy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y - missileImage.getHeight()/2;
+	 int missilePosx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x - missileImage.getWidth()/2;
+	 int missilePosy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y - missileImage.getHeight()/2;
 	 
 	 int aircraftPosx = (int) ((GameWorldModel)getModel()).getAircraft().getPosition().x - aircraftImage.getWidth()/2;
 	 int aircraftPosy = (int) ((GameWorldModel)getModel()).getAircraft().getPosition().y - aircraftImage.getHeight()/2;
 	 
-	 aircraftPosx = aircraftPosx - misslePosx + 500;
-	 aircraftPosy = aircraftPosy - misslePosy + 250;
+	 aircraftPosx = aircraftPosx - missilePosx + 500;
+	 aircraftPosy = aircraftPosy - missilePosy + 250;
+	 
+	 System.out.println(missilePosx - camx);
+	 System.out.println(missilePosy + camy);
+	 
+	 if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		  affineTransform.setToTranslation(missilePosx - camx + 395,
+					missilePosy + camy - 583);
+			
+	 g2d.drawImage(missileImage, affineTransform, this); 
+	 
+	 if(((GameWorldModel)getModel()).getMissile().state != State.EXPLODE)	 
+	 drawImage(dbg, aircraftImage, aircraftPosx, aircraftPosy);
 	  
 	
   //draw airplane
@@ -302,7 +347,7 @@ private void gameRender(int x, int y)
 		 	((GameWorldModel)getModel()).getAircraft().getPosition().x - aircraftImage.getWidth()/2, 
 		 		(int) ((GameWorldModel)getModel()).getAircraft().getPosition().y - aircraftImage.getHeight()/2) ;
 	*/
-	drawImage(dbg, aircraftImage, aircraftPosx, aircraftPosy);
+	//drawImage(dbg, aircraftImage, aircraftPosx, aircraftPosy);
   
   dbg.setFont(new Font(Font.DIALOG, Font.BOLD, 15));
   
@@ -370,12 +415,18 @@ private void drawImage(Graphics dbg2, Image image, int x, int y){
     dbg2.drawImage(image, x, y, this);
 }
 private void gameUpdate(){
+	
+	//Switch between these first 2 ifs for cool stuff
+	
 	if(!isPaused && guidanceSelected)
+	//if(!isPaused )
 		((GameWorldModel)getModel()).update();
-	else if (((GameWorldModel)getModel()).getMissile().isPressed)
+	/*else if (((GameWorldModel)getModel()).getMissile().isPressed)
 		((GameWorldModel)getModel()).getMissile().dragMissile();
 	else if (((GameWorldModel)getModel()).getAircraft().isPressed)
-		((GameWorldModel)getModel()).getAircraft().dragAircraft();
+		((GameWorldModel)getModel()).getAircraft().dragAircraft();*/
+	if(mouseAction)
+		dragView();
 }
 
 public void mouseClicked (MouseEvent me) { 
@@ -421,7 +472,7 @@ public void resumeGame(){
 
 
 
-
+    
 
 	@Override
 	public void modelChanged(ModelEvent event) {}
@@ -433,14 +484,62 @@ public void resumeGame(){
 	public void mouseReleased(MouseEvent me) {
 		((GameWorldModel)getModel()).getMissile().isPressed = false;
 		((GameWorldModel)getModel()).getAircraft().isPressed = false;
+		mouseAction = false;
 	}
 
+	
 
+	public void dragView(){
+		
+		 
+	
+		if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		{
+		
+	     	int ydif = 0;
+		    int xdif = 0;
+		 
+	     	xdif = MouseInfo.getPointerInfo().getLocation().x - mxLast;
+		    ydif = MouseInfo.getPointerInfo().getLocation().y - myLast;
+		
+	
+		
+		
+		    camx -= xdif;
+	        if(camx < -400)
+		       camx = -400;
+		
+		    camy += ydif;
+            if(camy < 300)
+		       camy = 300;
+			
+		    mxLast =  MouseInfo.getPointerInfo().getLocation().x;
+		    myLast =  MouseInfo.getPointerInfo().getLocation().y;
+		
+		
+		
+		}
+	}
+		
+	
+	
+
+	
 
 	@Override
 	public void mousePressed(MouseEvent me) {
 		
-		if(((GameWorldModel)getModel()).getMissile().guide == Guidance.NONE){
+	
+		if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		{
+				  mouseAction = true;
+				  mxLast =  MouseInfo.getPointerInfo().getLocation().x;
+				  myLast = MouseInfo.getPointerInfo().getLocation().y;	
+		}
+		
+		else if(((GameWorldModel)getModel()).getMissile().guide == Guidance.NONE){
+			
+			  
 			double distMissile = Math.sqrt( (me.getX() - ((GameWorldModel)getModel()).getMissile().pos().x * (me.getX() - ((GameWorldModel)getModel()).getMissile().pos().x) 
 				+ (me.getY() - ((GameWorldModel)getModel()).getMissile().pos().y) * (me.getY() - ((GameWorldModel)getModel()).getMissile().pos().y)));
 	
@@ -451,6 +550,8 @@ public void resumeGame(){
 				((GameWorldModel)getModel()).getMissile().isPressed = true;
 			else if(distAircraft < 70)
 				((GameWorldModel)getModel()).getAircraft().isPressed = true;
+			
 		}
+	
 	}
 }
