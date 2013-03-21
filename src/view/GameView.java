@@ -579,19 +579,19 @@ public void resumeGame(){
 	
 	
 	public void dumpImage()
-	{/*
+	{
 		System.out.println("Dumping map image...");
 		int x = ((GameWorldModel)getModel()).getMapX();
 		int y = ((GameWorldModel)getModel()).getMapY();
-		
+		System.out.println("x:" + x + " y:" + y);
 		
 		
 		BufferedImage result = new BufferedImage(
-               x, y,
+               x * 100, y * 100,
                 BufferedImage.TYPE_INT_RGB);
          Graphics g = result.getGraphics();
-         for(int i = 0; i < x; i++)
-        	 for(int j = 0; j < y; j++)
+         for(int i = x-1; i >= 0; i--)
+        	 for(int j = y-1; j >= 0; j--)
         	 {
         		 BufferedImage bi = null;
         		 try{
@@ -604,7 +604,7 @@ public void resumeGame(){
         			 String s = e.getMessage();
                 	 System.out.println(s);
         		 }
-        		 g.drawImage(bi, x, y, null);
+        		 g.drawImage(bi, i * 100, j * 100, null);
         	 }
          try{
          ImageIO.write(result,"gif",new File("result.gif"));
@@ -615,7 +615,7 @@ public void resumeGame(){
         	 System.out.println(s);
          }
          System.out.println("Dump complete. Image located under vpproject folder.");
-         System.out.println("Drag mouse to move map.");*/
+         System.out.println("Drag mouse to move map.");
 	}
 	
 }
