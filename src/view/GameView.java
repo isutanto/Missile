@@ -2,6 +2,7 @@ package view;
 
 import controller.GameController;
 import model.GameWorldModel;
+import model.Missile;
 import model.Missile.Guidance;
 import model.Missile.State;
 import model.ModelEvent;
@@ -434,13 +435,16 @@ private void gameUpdate(){
 	
 	//Switch between these first 2 ifs for cool stuff
 	
-	if(!isPaused && guidanceSelected && ((GameWorldModel)getModel()).getMissile().getMissileState()!= ((GameWorldModel)getModel()).getMissile().state.EXPLODE)
+	if(!isPaused && guidanceSelected && ((GameWorldModel)getModel()).getMissile().getMissileState()!= State.EXPLODE)
 	//if(!isPaused )
 		((GameWorldModel)getModel()).update();
 	/*else if (((GameWorldModel)getModel()).getMissile().isPressed)
 		((GameWorldModel)getModel()).getMissile().dragMissile();
 	else if (((GameWorldModel)getModel()).getAircraft().isPressed)
 		((GameWorldModel)getModel()).getAircraft().dragAircraft();*/
+	
+	
+	// prompt for action from user, dump data, dump image, restart game.
 	if(mouseAction)
 		dragView();
 }
@@ -457,17 +461,17 @@ public void mouseClicked (MouseEvent me) {
 		//parallel distance
 		double distParallel = Math.sqrt( (me.getX() - GameView.PARALLEL_X) * (me.getX() - GameView.PARALLEL_X) + (me.getY() - GameView.GUIDANCE_Y) * (me.getY() - GameView.GUIDANCE_Y));
 
-		if(distPursuit < 50){
+		if(distPursuit < Missile.BLAST_RADIUS){
 			((GameController)getController()).operation("pursuit");
 			guidanceSelected = true;
 			((GameWorldModel)getModel()).lastCall = System.nanoTime();	
 		}
-		else if(distProp < 50){
+		else if(distProp < Missile.BLAST_RADIUS){
 			((GameController)getController()).operation("proportional");
 			guidanceSelected = true;
 			((GameWorldModel)getModel()).lastCall = System.nanoTime();
 		}
-		else if (distParallel < 50){
+		else if (distParallel < Missile.BLAST_RADIUS){
 			((GameController)getController()).operation("parallel");
 			guidanceSelected = true;
 			((GameWorldModel)getModel()).lastCall = System.nanoTime();
@@ -487,7 +491,10 @@ public void resumeGame(){
 }
 
 
-
+public void restart()
+{
+	
+}
     
 
 	@Override

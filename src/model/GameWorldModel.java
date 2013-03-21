@@ -222,9 +222,9 @@ public void update() {
 	    missile.state = Missile.State.EXPLODE;
 	}
 	
-	if(missile.position.distance(aircraft.position) <= 50){
+	if(missile.position.distance(aircraft.position) <= Missile.BLAST_RADIUS){
 		missile.image = kaboom;
-		aircraft.image=kaboom;
+		aircraft.image=kaboom;   
 		missile.velocity.Zero();
 		aircraft.velocity.Zero();
 		missile.state = Missile.State.EXPLODE;

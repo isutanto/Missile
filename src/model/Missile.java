@@ -15,14 +15,14 @@ import javax.imageio.ImageIO;
  */
 public class Missile extends MovingEntity {
 	
-	public static final int BLAST_RADIUS = 85;
+	public static final int BLAST_RADIUS = 30;
 	private SteeringBehaviors steering;
 	public Vector2D gForce;
 	
 	public enum State {
 		ACCEL, FREEFALL, GROUND, EXPLODE
 	}
-	public static State state;
+	public State state;
 	
 	public enum Guidance{
 		PROPOTIONAL, PURSUIT, PARALLEL, NONE
@@ -352,11 +352,6 @@ public class Missile extends MovingEntity {
 	}
 	
 	public State getMissileState()
-	{
-		return state;
-	}
-	
-	public static State getState()
 	{
 		return state;
 	}
