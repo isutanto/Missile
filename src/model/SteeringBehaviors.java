@@ -4,18 +4,20 @@ import java.util.Random;
 
 
 public class SteeringBehaviors {
-
 	/**
 	 * 
 	 * @param Vector2D
 	 */
 	
 	/** the radius of the constraining circle for the wander behavior */
-	public static final double wanderRad = 1.2;
+	//public static final double wanderRad = 1.2;
+	public static final double wanderRad = 3; 
 	/** distance the wander circle is projected in front of the agent */
-	public static final double wanderDist   = 2.0;
+	//public static final double wanderDist   = 2.0;
+	public static final double wanderDist = 10.0; 
 	/** the maximum amount of displacement along the circle each frame */
-	public static final double wanderJitterPerSec = 40.0;
+	//public static final double wanderJitterPerSec = 40.0;
+	public static final double wanderJitterPerSec = 40000000.0; 
 	
 	private enum BehaviorType{
 		NONE(1), 
@@ -42,7 +44,9 @@ public class SteeringBehaviors {
 	double curAngle;
 
 	public	Missile entity;
-
+	
+	public Aircraft aircraft_entity;
+	
 	public MovingEntity myTarget;
 	
 	//private GameWorldModel world;	//world data
@@ -140,39 +144,30 @@ public class SteeringBehaviors {
 		System.out.println("in flee");
 		
 		final double panicDistSq = 100.0 * 100.0;
-		// change entity to myTarget
-		if(myTarget.pos().distanceSq(target) > panicDistSq){
+		if(entity.pos().distanceSq(target) > panicDistSq){
 			return new Vector2D();
 		}
-
-		Vector2D desiredVelocity = (myTarget.pos()).sub(target);
+	
+		Vector2D desiredVelocity = (entity.pos()).sub(target);
 		desiredVelocity.normalize();
-		desiredVelocity = desiredVelocity.mul(myTarget.maxForce());
+		desiredVelocity = desiredVelocity.mul(entity.maxForce());
 		
-		return (desiredVelocity.sub(myTarget.velocity()));	
-//--------------------------------
+		return (desiredVelocity.sub(entity.velocity()));	
 	}
 	
 	public Vector2D evade(Missile pursuer){
 		System.out.println("in evade");
-		
-		//change entity to myTarget
-		Vector2D toPursuer = (pursuer.pos()).sub(myTarget.pos());//(entity.pos());
-		double lookAheadTime = toPursuer.length() / (myTarget.maxForce() + pursuer.speed());
-		//-----------------------
-					
-		
+		Vector2D toPursuer = (pursuer.pos()).sub(entity.pos());
+		double lookAheadTime = toPursuer.length() / (entity.maxForce() + pursuer.speed());
 		return flee(pursuer.pos().add(pursuer.velocity().mul(lookAheadTime)));
 	}
 	
-	public Vector2D wander() {
+	public Vector2D wander()
+	{
 		//first, add a small random vector to the target's position
 		System.out.println("in wander");
-	
-		//need to look at
-		
-		/*
-		wanderTarget = wanderTarget.add(new Vector2D( new Random().nextDouble()* wanderJitter, new Random().nextDouble() * wanderJitter));
+		wanderTarget = wanderTarget.add(new Vector2D( new Random().nextDouble()* wanderJitter,
+				new Random().nextDouble() * wanderJitter));
 		//reproject this new vector back on to a unit circle
 		wanderTarget.normalize();
 		//increase the length of the vector to the same as the radius
@@ -183,20 +178,47 @@ public class SteeringBehaviors {
 		//project the target into world space
 		Vector2D newTarget = Transformations.pointToLocalSpace(target2, entity.heading(), entity.side(), entity.pos());
 		//and steer towards it
-		return newTarget.sub(entity.pos()); */
-		
-		Vector2D continueOn = new Vector2D(); 
-		
-		return continueOn; 
-		
-		
+		return newTarget.sub(entity.pos()); 		
 	}
 	
-	public double proportional() {
+	public Vector2D aircraftwander() 
+	{
+		//first, add a small random vector to the target's position
+		//System.out.println("in wander");
+		wanderTarget = wanderTarget.add(new Vector2D( new Random().nextDouble()* wanderJitter,
+						new Random().nextDouble() * wanderJitter));
+		//reproject this new vector back on to a unit circle
+		wanderTarget.normalize();
+		
+		//increase the length of the vector to the same as the radius
+		//of the wander circle
+		wanderTarget = wanderTarget.mul(wanderRadius);
+		//move the target into a position WanderDist in front of the agent
+		Vector2D target2 = wanderTarget.add(new Vector2D(wanderDistance, 0));
+		
+		//project the target into world space
+		Vector2D newTarget = Transformations.pointToLocalSpace(target2, aircraft_entity.heading(), aircraft_entity.side(), aircraft_entity.pos());
+		
+		newTarget.x *= -1; 
+		newTarget.y *= -1; 
+		
+		//and steer towards it
+		return newTarget; 
+	}
+	
+	public double proportional() 
+	{
 		return entity.getAngle(getMyTarget().position);
 	}
 	
-	public double pursuit(MovingEntity evader){		
+	public double proportionalWander() 
+	{
+		Vector2D wander_pos = getMyTarget().steering.aircraftwander(); 
+		return entity.getAngle(wander_pos);
+	}
+	
+	public double pursuit (MovingEntity evader)
+	{		
 		Vector2D toEvader = evader.pos().sub(entity.pos());
 		double lookAheadTime = toEvader.length() / (entity.maxSpeed() + evader.speed());
 		
@@ -205,16 +227,40 @@ public class SteeringBehaviors {
 		return entity.getAngle(desiredVector);
 	}
 	
-	public double parallel(MovingEntity target){
+	public double pursuitWander (MovingEntity evader)
+	{
+		Vector2D wander_pos = evader.steering.aircraftwander(); 
+		
+		Vector2D toEvader = wander_pos.sub(entity.pos());
+		double lookAheadTime = toEvader.length() / (entity.maxSpeed() + evader.speed());
+		
+		Vector2D desiredVector = new Vector2D(wander_pos);
+		desiredVector = desiredVector.add(evader.velocity().mul(lookAheadTime));
+		return entity.getAngle(desiredVector);
+	}
+	
+	public double parallel (MovingEntity target)
+	{
 		Vector2D toEvader = target.pos().sub(entity.pos());
 		double lookAheadTime = toEvader.length() / (entity.maxSpeed() + target.speed());
 		
 		Vector2D desiredVector = new Vector2D(target.pos());
 		desiredVector = desiredVector.add(target.velocity().mul(lookAheadTime));
 		return entity.getAngle(desiredVector);
-		
 	}
-
+	
+	public double parallelWander (MovingEntity target)
+	{
+		Vector2D wander_pos = target.steering.aircraftwander();  
+		
+		Vector2D toEvader = wander_pos.sub(entity.pos());
+		double lookAheadTime = toEvader.length() / (entity.maxSpeed() + target.speed());
+		
+		Vector2D desiredVector = new Vector2D(wander_pos);
+		desiredVector = desiredVector.add(target.velocity().mul(lookAheadTime));
+		return entity.getAngle(desiredVector);
+	}
+	
 	/****END OF BEHAVIORS******/
 	
 
@@ -297,11 +343,19 @@ public class SteeringBehaviors {
 				
 	}
 	
-	public SteeringBehaviors(Aircraft aircraft) {
+	public SteeringBehaviors(Aircraft aircraft) 
+	{
 		// TODO Auto-generated constructor stub
 		
-		//insert behaviour for the aircraft *want to test it!!*
-	
+		this.aircraft_entity = aircraft; 	
+		
+		wanderDistance				= wanderDist;
+		wanderJitter				= wanderJitterPerSec;
+		wanderRadius				= wanderRad;
+		
+		double theta = Math.random() * (2* Math.PI);
+		
+		wanderTarget = new Vector2D(wanderRadius * Math.cos(theta), wanderRadius * Math.sin(theta));	
 	}
 
 	public Vector2D calculate(){
