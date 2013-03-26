@@ -317,7 +317,7 @@ private void gameRender(int x, int y)
 	
 	 */
 	 affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
-			PHEIGHT / 2 - missileImage.getHeight());
+			PHEIGHT / 2 - missileImage.getHeight()/2);
 	
 	//rotate with the anchor point as the mid of the image 
 		
@@ -400,23 +400,23 @@ for (int i = 0; i < ((GameWorldModel)getModel()).getMissile().positionArray.size
   dbg.drawString("FPS: " + lastFps, 900, 490);
   
   //draw missile's state
-  dbg.drawString("Missile state: " + ((GameWorldModel)getModel()).getMissile().state, 800, 35);
-  dbg.drawString("Missile guide: " + ((GameWorldModel)getModel()).getMissile().guide, 800, 50);
-  dbg.drawString("Distance to target: " + (int) ((GameWorldModel)getModel()).getMissile().distanceToTarget(), 800, 65);
-  dbg.drawString("Current Angle: " + ((GameWorldModel)getModel()).getMissile().curAngle, 800, 80);
-  dbg.drawString("Desired Angle: " +  (int) ((GameWorldModel)getModel()).getMissile().desiredAngle, 800, 95);
-  dbg.drawString("Missile velocity: " + (int) ((GameWorldModel)getModel()).getMissile().velocity().x + ", " + (int) -((GameWorldModel)getModel()).getMissile().velocity().y, 800, 110);
+  dbg.drawString("Missile state: " + ((GameWorldModel)getModel()).getMissile().state, 700, 35);
+  dbg.drawString("Missile guide: " + ((GameWorldModel)getModel()).getMissile().guide, 700, 50);
+  dbg.drawString("Distance to target: " + (int) ((GameWorldModel)getModel()).getMissile().distanceToTarget(), 700, 65);
+  dbg.drawString("Current Angle: " + ((GameWorldModel)getModel()).getMissile().curAngle, 700, 80);
+  dbg.drawString("Desired Angle: " +  (int) ((GameWorldModel)getModel()).getMissile().desiredAngle, 700, 95);
+  dbg.drawString("Missile velocity: " + (int) ((GameWorldModel)getModel()).getMissile().velocity().x + ", " + (int) -((GameWorldModel)getModel()).getMissile().velocity().y, 700, 110);
  
 
 
   
   //Force values
-  dbg.drawString("Time: " + (int) ((GameWorldModel)getModel()).getMissile().timeSeconds, 900, 385);
-  dbg.drawString("Thrust: " + ((GameWorldModel)getModel()).getMissile().thrustForce, 900, 400);
-  dbg.drawString("Lift: " + ((GameWorldModel)getModel()).getMissile().liftForce, 900, 415);
-  dbg.drawString("Drag: " + ((GameWorldModel)getModel()).getMissile().dragForce, 900, 430);
-  dbg.drawString("Weight: " + ((GameWorldModel)getModel()).getMissile().weight, 900, 445);
-  dbg.drawString("Map Area: " + "(" + left + ", " + bottom + ", " + (left + 12) + ", " + (bottom + 7) + ")", 825, 460);
+  dbg.drawString("Time: " + (int) ((GameWorldModel)getModel()).getMissile().timeSeconds, 700, 345);
+  dbg.drawString("Thrust: " + ((GameWorldModel)getModel()).getMissile().thrustForce, 700, 360);
+  dbg.drawString("Lift: " + ((GameWorldModel)getModel()).getMissile().liftForce, 700, 375);
+  dbg.drawString("Drag: " + ((GameWorldModel)getModel()).getMissile().dragForce, 700, 390);
+  dbg.drawString("Weight: " + ((GameWorldModel)getModel()).getMissile().weight, 700, 405);
+  dbg.drawString("Map Area: " + "(" + left + ", " + bottom + ", " + (left + 12) + ", " + (bottom + 7) + ")", 700, 420);
  // dbg.drawString("G-Force: " + (int) ((GameWorldModel)getModel()).getMissile().gForce.y, 900, 460);
  
 }

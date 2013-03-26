@@ -108,7 +108,7 @@ public class Missile extends MovingEntity {
 			System.out.println("Can't find missile.gif!");
 		}
 		
-		 G0 = (int) (.0097 * mass);
+		G0 = (int) (.0097 * mass);
 		steering = new SteeringBehaviors(this, target);
 		desiredAngle = curAngle = 90;
 		positionArray = new ArrayList<Vector2D>(10);
