@@ -36,7 +36,7 @@ public class Missile extends MovingEntity {
 	public static final long BURNOUT = 15;
 	
 	//total time elapsed in nanoseconds
-	private double totalTime;
+	public double totalTime;
 	
 	//total time elapsed in seconds
 	public double timeSeconds;
@@ -56,6 +56,7 @@ public class Missile extends MovingEntity {
 	
 	//Array of positions 
 	public ArrayList<Vector2D> positionArray;
+	public ArrayList<Double> speedArray;
 	
 	//Equation constants
 	//Lift force
@@ -117,6 +118,8 @@ public class Missile extends MovingEntity {
 		
 		guide = Guidance.NONE;
 		calledOnce = false;
+		
+		speedArray = new ArrayList<Double>(10);
 
 	}
 	
@@ -168,9 +171,9 @@ public class Missile extends MovingEntity {
 		
 		if(positionTimeCount < timeSeconds){ //add a point to be drawn every .5 seconds
 			positionTimeCount += .5;
-		  	positionArray.add(new Vector2D(position));
+			if(!(state == State.EXPLODE))
+		  	   positionArray.add(new Vector2D(position));
 		}
-		
 		
 		//if the vehicle has a non zero velocity the heading and side vectors must 
 		//be updated
@@ -180,6 +183,8 @@ public class Missile extends MovingEntity {
 			heading.normalize();
 			
 			side = heading.perp();
+			
+			speedArray.add(velocity.length());
 		}
 }
 
@@ -342,6 +347,10 @@ public class Missile extends MovingEntity {
 
 	public void dragMissile() {
 		//position.x = MouseInfo.getPointerInfo().getLocation().x;		
+	}
+	public ArrayList<Double> getSpeedArray()
+	{
+		return speedArray;
 	}
 
 }
