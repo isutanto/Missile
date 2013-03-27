@@ -59,10 +59,11 @@ public class GameWorldModel extends AbstractModel {
 			   MAP[i][j] = 2 + randomGenerator.nextInt(4);
 		}
 	
+
 			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 2, new Vector2D (0, 0), 5000, 
-					new Vector2D(0, 0), 1, 2, aircraft);
+	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 3.0);
+			missile = new Missile(new Vector2D (200, 400), 10, new Vector2D(0, 0), 2, new Vector2D (0, 0), 5000, 
+					new Vector2D(0, 0), 1.0, 5.0, aircraft);
 			
 			aircraft.getSteering().setTarget(missile); 
 			
@@ -233,6 +234,10 @@ public void update() {
 	lastCall = System.nanoTime();
 	
 }
+//<<<<<<< HEAD
+//=======
+public BufferedImage boom(){return kaboom;}
+//>>>>>>> c9ac1d9c9f12447327c642ed59d43e78b8b36d76
 public int getMapX(){ return MAPX;}
 public int getMapY(){ return MAPY;}
 }

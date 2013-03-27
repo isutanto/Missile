@@ -1,3 +1,4 @@
+
 package model;
 
 import java.awt.MouseInfo;
@@ -176,4 +177,5 @@ public class Aircraft extends MovingEntity {
 		// TODO Auto-generated method stub
 		
 	}
+
 }
