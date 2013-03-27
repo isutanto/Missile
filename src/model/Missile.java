@@ -38,7 +38,7 @@ public class Missile extends MovingEntity {
 
 	
 	//total time elapsed in nanoseconds
-	private double totalTime;
+	public double totalTime;
 	
 	//total time elapsed in seconds
 	public double timeSeconds;
@@ -58,6 +58,7 @@ public class Missile extends MovingEntity {
 	
 	//Array of positions 
 	public ArrayList<Vector2D> positionArray;
+	public ArrayList<Double> speedArray;
 	
 	//Equation constants
 	//Lift force
@@ -119,6 +120,8 @@ public class Missile extends MovingEntity {
 		
 		guide = Guidance.NONE;
 		calledOnce = false;
+		
+		speedArray = new ArrayList<Double>(10);
 
 	}
 	
@@ -170,9 +173,9 @@ public class Missile extends MovingEntity {
 		
 		if(positionTimeCount < timeSeconds){ //add a point to be drawn every .5 seconds
 			positionTimeCount += .5;
-			positionArray.add(new Vector2D(position));
+			if(!(state == State.EXPLODE))
+		  	   positionArray.add(new Vector2D(position));
 		}
-		
 		
 		//if the vehicle has a non zero velocity the heading and side vectors must 
 		//be updated
@@ -182,6 +185,8 @@ public class Missile extends MovingEntity {
 			heading.normalize();
 			
 			side = heading.perp();
+			
+			speedArray.add(velocity.length());
 		}
 }
 
@@ -195,8 +200,11 @@ public class Missile extends MovingEntity {
 			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
 			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
 		}
+	
+		
 		
 	}
+	
 
 	private void getDesiredAngle() {
 		
@@ -348,7 +356,11 @@ public class Missile extends MovingEntity {
 	}
 
 	public void dragMissile() {
-		position.x = MouseInfo.getPointerInfo().getLocation().x;		
+		//position.x = MouseInfo.getPointerInfo().getLocation().x;		
+	}
+	public ArrayList<Double> getSpeedArray()
+	{
+		return speedArray;
 	}
 	
 	public State getMissileState()
