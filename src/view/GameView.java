@@ -565,59 +565,10 @@ public void resumeGame(){
 	public void mouseReleased(MouseEvent me) {
 		((GameWorldModel)getModel()).getMissile().isPressed = false;
 		((GameWorldModel)getModel()).getAircraft().isPressed = false;
-/*<<<<<<< HEAD
-		mouseAction = false;
-	}
 
-	
-
-	public void dragView(){
-		
-		 
-	
-		if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
-		{
-		
-	     	int ydif = 0;
-		    int xdif = 0;
-		 
-	     	xdif = MouseInfo.getPointerInfo().getLocation().x - mxLast;
-		    ydif = MouseInfo.getPointerInfo().getLocation().y - myLast;
-		
-	
-		
-		
-		    camx -= xdif;
-	        if(camx < -400)
-		       camx = -400;
-		
-		    camy += ydif;
-            if(camy < 300)
-		       camy = 300;
-			
-		    mxLast =  MouseInfo.getPointerInfo().getLocation().x;
-		    myLast =  MouseInfo.getPointerInfo().getLocation().y;
-		
-		
-		
-		}
-	}
-		
-	
-	
-
-	
-
-	@Override
-	public void mousePressed(MouseEvent me) {
-		
-		if(!imageDumped && ((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
-		{
-				dumpImage();
-				imageDumped = true;
-=======*/
 	    mouseAction = false;
 	}
+	
 public void dragView()
 {
     if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
@@ -639,14 +590,13 @@ public void dragView()
 	   myLast =  MouseInfo.getPointerInfo().getLocation().y;
     }
 }
-	@Override
+	//@Override
 	public void mousePressed(MouseEvent me) {
 		
 		if(!dump && ((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
 		{
 				dumpCharts();
 				dump = true;
-//>>>>>>> c9ac1d9c9f12447327c642ed59d43e78b8b36d76
 		}
 		
 	

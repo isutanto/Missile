@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
  */
 public class Missile extends MovingEntity {
 	
-	public static final int BLAST_RADIUS = 30;
+	public static final int BLAST_RADIUS = 25;
 	private SteeringBehaviors steering;
 	public Vector2D gForce;
 	
