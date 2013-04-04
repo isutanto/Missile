@@ -36,6 +36,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -114,7 +115,7 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  
 	  boolean chartsCreated = false;
 	  boolean drawMe = false;
-      
+	  
 	  
 	  public GameView(GameWorldModel model, GameController controller)
 	  {
@@ -129,14 +130,7 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 		*/
 		testPanel.setPreferredSize( new Dimension(PWIDTH, PHEIGHT));
 		testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.LINE_AXIS));
-		//testPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
-		//JScrollPane scrollBar=new JScrollPane(testPanel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
-		//JScrollPane scrollBar=new JScrollPane(testPanel);  
-		
-		//scrollBar.setSize(PWIDTH,PHEIGHT);  
-	    //scrollBar.setLocation(PWIDTH,0);  
-	   
-		//this.getContentPane().add(scrollBar, BorderLayout.CENTER);    
+		//testPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); 
 		
 	    setFocusable(true);
 	    requestFocus(); 
@@ -416,7 +410,7 @@ private void gameRender()
 			createSpeedChart(((GameWorldModel)getModel()).getMissile().getSpeedArray());
 			chartsCreated = true;
 	    }
-	}   
+	}
 }
 private void drawImage(Graphics dbg2, Image image, int x, int y){ 
 
@@ -547,15 +541,23 @@ public void dragView()
 	
 		System.out.println("Creation complete.");
 	}
+	public XYSeries updateDataSet(XYSeries s, double x, double y)
+	{
+		s.addOrUpdate(x,y);
+		return s;
+	}
 	public void createXPositionChart()
 	{
+		
 		JFreeChart chart = null;
 		XYSeries positions = new XYSeries("XYGraph");
+		double time = 0;
  
 		for (int i = 0; i < ((GameWorldModel)getModel()).getMissile().positionArray.size() - 1; i++)
 		{
 		   int xPos = -200 + (int)((GameWorldModel)getModel()).getMissile().positionArray.get(i).x;
-		   double time = timeArray.get(i);
+		   if(i < timeArray.size())
+		       time = timeArray.get(i);
 
 		   positions.add(time,xPos);
         }
@@ -583,6 +585,23 @@ public void dragView()
 		{
 		   	System.err.println("Problem saving file.");
 		}
+		JFrame frame = new JFrame();
+		frame.setLayout(new BorderLayout());
+		frame.setBounds(300, 100, 500, 300);
+		frame.setVisible(true);
+
+		JPanel jPanel = new JPanel();
+		jPanel.setLayout(new java.awt.BorderLayout());
+		 
+		ChartPanel CP = new ChartPanel(chart);
+		 
+		jPanel.add(CP,BorderLayout.CENTER);
+		jPanel.validate();
+		frame.add(jPanel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+       
+	
 	}
 	public void createPositionChart()
 	{
@@ -622,17 +641,35 @@ public void dragView()
 		{
 		   	System.err.println("Problem saving file.");
 		}	
+		JFrame frame = new JFrame();
+		frame.setLayout(new BorderLayout());
+		frame.setBounds(1000, 600, 500, 300);
+		frame.setVisible(true);
+
+		JPanel jPanel = new JPanel();
+		jPanel.setLayout(new java.awt.BorderLayout());
+		 
+		ChartPanel CP = new ChartPanel(chart);
+		 
+		jPanel.add(CP,BorderLayout.CENTER);
+		jPanel.validate();
+		frame.add(jPanel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
 	}
 	public void createYPositionChart()
 	{
 		JFreeChart chart = null;
 		XYSeries positions = new XYSeries("XYGraph");
+		
+		double time = 0;
  
 		for (int i = 0; i < ((GameWorldModel)getModel()).getMissile().positionArray.size() - 1; i++)
 		{
 		   //Weird thing here. When in jpanel, positive y direction points down.
 		   int yPos = 400 -(int)((GameWorldModel)getModel()).getMissile().positionArray.get(i).y;
-		   double time = timeArray.get(i);
+		   if(i < timeArray.size())
+		      time = timeArray.get(i);
 		   
 		   positions.add(time,yPos);
         }
@@ -660,6 +697,21 @@ public void dragView()
 		{
 		   	System.err.println("Problem saving file.");
 		}
+		JFrame frame = new JFrame();
+		frame.setLayout(new BorderLayout());
+		frame.setBounds(1000, 100, 500, 300);
+		frame.setVisible(true);
+
+		JPanel jPanel = new JPanel();
+		jPanel.setLayout(new java.awt.BorderLayout());
+		 
+		ChartPanel CP = new ChartPanel(chart);
+		 
+		jPanel.add(CP,BorderLayout.CENTER);
+		jPanel.validate();
+		frame.add(jPanel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
 	}
 	public void createSpeedChart(ArrayList<Double> speedArray)
 	{
@@ -698,5 +750,21 @@ public void dragView()
 		{
 		   	System.err.println("Problem saving file.");
 		}
+		JFrame frame = new JFrame();
+		frame.setLayout(new BorderLayout());
+		frame.setBounds(300, 600, 500, 300);
+		frame.setVisible(true);
+
+		JPanel jPanel = new JPanel();
+		jPanel.setLayout(new java.awt.BorderLayout());
+		 
+		ChartPanel CP = new ChartPanel(chart);
+		 
+		jPanel.add(CP,BorderLayout.CENTER);
+		jPanel.validate();
+		frame.add(jPanel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
 	}
+
 }

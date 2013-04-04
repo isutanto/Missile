@@ -203,6 +203,16 @@ public void resizeMap()
 			else
 			   temp[i][j] = 2 + randomGenerator.nextInt(4);
 		}
+   
+   for(int i = 0; i < MAPX; i++)
+		for(int j = MAPY/2; j < MAPY; j++)
+		{
+			int d = randomGenerator.nextInt(10);
+			if(d >= 1)
+				temp[i][j] = 1;
+			else
+			   temp[i][j] = 2 + randomGenerator.nextInt(4);
+		}
   
    
    MAP = temp;
