@@ -1,18 +1,2 @@
-/.DS_Store
-/.classpath
-/.project
-/Class Diagram1.jpg
-/Class Diagram2.jpg
-/Class Diagram3.jpg
-/Class Diagram4.jpg
-/Class Diagram5.jpg
-/Missile_UML.vpp
-/Missile_UML.vpp.bak
-/Missile_UML.vpp~22
-/Missile_UML.vpp~23
-/controller
-/model
-/model.GameWorldModel.GameWorldModel().jpg
-/model.jpg
 /view
-/view.jpg
+/model
