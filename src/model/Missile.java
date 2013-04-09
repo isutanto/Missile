@@ -20,7 +20,7 @@ public class Missile extends MovingEntity {
 	public Vector2D gForce;
 	
 	public enum State {
-		ACCEL, FREEFALL, GROUND, EXPLODE
+		ACCEL, FREEFALL, GROUND, EXPLODE, MISSED
 	}
 	public State state;
 	
@@ -33,7 +33,7 @@ public class Missile extends MovingEntity {
 	public boolean isPressed;
 	
 	//time for engine to burnout
-	public static final long BURNOUT = 25;
+	public static final long BURNOUT = 50;
 	
 	//total time elapsed in nanoseconds
 	private double totalTime;
@@ -51,7 +51,7 @@ public class Missile extends MovingEntity {
 	public int dragForce;
 	public int thrustForce;
 	
-	private static final double TURN_RATE = 1; // angle turn rate
+	private static final double TURN_RATE = 3; // angle turn rate
 	private static final int COOLDOWN = 2; //time missile flies at 90 degrees until guidance kicks in
 	
 	//Array of positions 
@@ -62,7 +62,8 @@ public class Missile extends MovingEntity {
 	private static final double Cy = 1; //lift coefficient
 	private static final double rho = 1.4; //density of air
 	private static final double Sb = 2.1; //wing span
-	
+	private static final double MISSED_SPEEDUP = 2.0;
+	private static final double MISSED_ANGLE = -255.0;
 	//Thrust force
 	private static final double Gc = 5; //Gallons of fuel consumed per second
 	private static final double g = 9.8; // acceleration of gravity m/s^2
@@ -131,7 +132,7 @@ public class Missile extends MovingEntity {
 		calculateWeight();
         //add up, calculate acceleration/position
 		
-		if(state == State.ACCEL || state == State.FREEFALL){
+		if(state == State.ACCEL || state == State.MISSED){
 			thrustForce = (int) thrust.x;
 			dragForce = (int) drag.x;
 			liftForce = (int) lift.x;
@@ -148,8 +149,6 @@ public class Missile extends MovingEntity {
 			
 			//add accelerations to velocity -- (multiply by delta t -- )
 			velocity = velocity.add(accel.mul(delta));
-			velocity = velocity.mul(50000);
-			
 			velocity.truncate(this.maxSpeed);
 			
 		}else{
@@ -184,19 +183,37 @@ public class Missile extends MovingEntity {
 
 	private void updatePosition() {
 		if(state == State.GROUND || state == State.EXPLODE)
-	    	velocity.Zero();
-	    else if (state == State.ACCEL){ //change curangle with velocity
-			//position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
-            System.out.println("Velocity: "+velocity);
-	    	position.x = position.x + velocity.x;
-			//position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle));
-			position.y = position.y + velocity.y;
-					/** Math.atan(velocity.y/velocity.x);*/
+			velocity.Zero();
+		else if (state == State.ACCEL){
+			System.out.println("Accel State");
+			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
+			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle));	
 		}else if (state == State.FREEFALL){
-			//position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
-			//position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
-			position.y = position.y + velocity.y;
-			position.x = position.x + velocity.x;
+			System.out.println("FreeFall State");
+			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
+			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
+		}
+		else if (state == State.MISSED){
+			System.out.println("Missed State");
+			//desiredAngle = missile heading and aircraft position
+			double x;
+			double y;
+			x = steering.myTarget.pos().x;
+			y = steering.myTarget.pos().y; 
+			Vector2D temp = new Vector2D (x, y);
+			
+			//Vector2D temp = steering.myTarget.pos();
+			temp.normalize();
+			desiredAngle = Math.toDegrees(Math.acos(heading.dot(temp)));
+			Vector2D w1;
+			//w1 = steering.wander();
+			w1 = steering.myTarget.steering.wander();
+			System.out.println("w1:"+w1);
+			Vector2D w2;
+		    w2 = w1.sub(position);
+		    w2.normalize();
+		    w2 = w2.mul(velocity.length() * MISSED_SPEEDUP);
+			position = position.add(w2);
 		}
 	}
 
@@ -223,19 +240,23 @@ public class Missile extends MovingEntity {
 			curAngle -= TURN_RATE;
 		else if((int)desiredAngle > curAngle)
 			curAngle += TURN_RATE;
+		    //curAngle = desiredAngle;
 	}
 	
 	
 	
-	
+	//loop -- target
 	public double getAngle(Vector2D targetPos) { 
 	    double angle = (double) Math.toDegrees(Math.atan2(targetPos.x - position.x, targetPos.y - position.y)); 
-	 
-	    if(angle < 0)
-	        angle += 360; 
-	   
-	    return angle - 90; 
-	
+	    System.out.println("getAngle()"+(angle-90));
+	    //260 255
+	    if(angle-90 < MISSED_ANGLE){
+	    	System.out.println("Angle < 0");
+	        state = State.MISSED;
+	        System.out.println("State: "+state);
+	        
+	    }
+	    return angle -90;
 	}
 
 	private void calculateWeight() {
@@ -265,9 +286,12 @@ public class Missile extends MovingEntity {
 	}
 
 	private void updateState(double timeSeconds) {
-		if(timeSeconds < BURNOUT)
-			state = State.ACCEL;
-		else if (state != State.EXPLODE)
+		if(timeSeconds < BURNOUT && state != State.MISSED){
+			System.out.println("State is != MISSED");
+//			state = State.ACCEL;
+			System.out.println("State: "+state);
+		}
+		else if (state != State.EXPLODE && state!=State.MISSED) 
 			state = State.FREEFALL;
 		if(position.y >= GameWorldModel.GROUND.y)
 			state = State.GROUND;
@@ -293,21 +317,15 @@ public class Missile extends MovingEntity {
 			Ph = 2;
 		else if (position.y < 450)
 			Ph = 1;
-		if(state == State.FREEFALL)
-			curAngle = -90;
-		else {
-			curAngle = 45;
-		}
+
 		double Pf = (Pc - Ph);
 		double temp = (Gc * u)/g;
 		temp += Pf*Sb;
-		//thrust = new Vector2D(temp, -temp); //magnitude -- vector along normalize angle multiply temp
-        
-		thrust = new Vector2D(Math.cos(Math.toRadians(curAngle)), -Math.sin(Math.toRadians(curAngle)));
-		System.out.println("Thrust: "+thrust);
+		thrust = new Vector2D(temp, -temp); //magnitude -- vector along normalize angle multiply temp
+		//thrust = new Vector2D(Math.cos(Math.toRadians(curAngle)), -Math.sin(Math.toRadians(curAngle)));
+		System.out.println(thrust);
 		thrust.mul(temp);
-		System.out.println("Thrust * temp:"+thrust.mul(temp));
-		System.out.println("Temp: "+temp);
+		System.out.println("Temp"+temp);
 		System.out.println("CurAngle"+curAngle);
 		
 	} //x,y coordinates from sin and cos -> normalized vector

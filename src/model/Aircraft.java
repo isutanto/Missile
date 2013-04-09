@@ -101,7 +101,8 @@ public class Aircraft extends MovingEntity {
 	public Vector2D getPosition(){
 		return this.position;
 	}
-
+	
+	
 	public void setVelocity(double velocity) {
 		throw new UnsupportedOperationException();
 	}

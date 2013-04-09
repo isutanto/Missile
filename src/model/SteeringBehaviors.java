@@ -11,13 +11,13 @@ public class SteeringBehaviors {
 	
 	/** the radius of the constraining circle for the wander behavior */
 	//public static final double wanderRad = 1.2;
-	public static final double wanderRad = 3; 
+	public static final double wanderRad = 75.0; 
 	/** distance the wander circle is projected in front of the agent */
 	//public static final double wanderDist   = 2.0;
-	public static final double wanderDist = 10.0; 
+	public static final double wanderDist = 20.00; 
 	/** the maximum amount of displacement along the circle each frame */
 	//public static final double wanderJitterPerSec = 40.0;
-	public static final double wanderJitterPerSec = 40000000.0; 
+	public static final double wanderJitterPerSec = 10000.0; 
 	
 	private enum BehaviorType{
 		NONE(1), 
@@ -60,6 +60,11 @@ public class SteeringBehaviors {
 	private double wanderJitter;
 	private double wanderRadius;
 	private double wanderDistance;
+	
+	private Vector2D wanderTargetCpy; 
+	private double wanderJitterCpy;
+	private double wanderRadiusCpy;
+	private double wanderDistanceCpy;
 	
 	private int flags;
 	//private BehaviorType behaviorType;
@@ -166,19 +171,26 @@ public class SteeringBehaviors {
 	{
 		//first, add a small random vector to the target's position
 		System.out.println("in wander");
-		wanderTarget = wanderTarget.add(new Vector2D( new Random().nextDouble()* wanderJitter,
-				new Random().nextDouble() * wanderJitter));
+		System.out.println("WanderTargetCpy Before: "+wanderTargetCpy);
+		wanderTargetCpy = wanderTargetCpy.add(new Vector2D( new Random().nextDouble()* wanderJitterCpy,
+				new Random().nextDouble() * wanderJitterCpy));
+		System.out.println("WanderTargetCpy After: "+wanderTargetCpy);
+		System.out.println("Random #"+new Random().nextDouble());
 		//reproject this new vector back on to a unit circle
-		wanderTarget.normalize();
+		wanderTargetCpy.normalize();
 		//increase the length of the vector to the same as the radius
 		//of the wander circle
-		wanderTarget = wanderTarget.mul(wanderRadius);
+		wanderTargetCpy = wanderTargetCpy.mul(wanderRadiusCpy);
+		System.out.println("WanderTargetCpy.mul"+wanderTargetCpy);
 		//move the target into a position WanderDist in front of the agent
-		Vector2D target2 = wanderTarget.add(new Vector2D(wanderDistance, 0));
+		Vector2D target2 = wanderTargetCpy.add(new Vector2D(wanderDistanceCpy, 0));
+		System.out.println("Target2:"+target2);
 		//project the target into world space
-		Vector2D newTarget = Transformations.pointToLocalSpace(target2, entity.heading(), entity.side(), entity.pos());
+		Vector2D newTarget = Transformations.pointToLocalSpace(target2, aircraft_entity.heading(), aircraft_entity.side(), aircraft_entity.pos());
 		//and steer towards it
-		return newTarget.sub(entity.pos()); 		
+		//return newTarget.sub(entity.pos());
+		System.out.println("NewTarget: "+newTarget);
+		return newTarget.mul(-1);
 	}
 	
 	public Vector2D aircraftwander() 
@@ -311,11 +323,15 @@ public class SteeringBehaviors {
 		target = new Vector2D();
 		steeringForce = new Vector2D();
 		wanderDistance				= wanderDist;
+		wanderDistanceCpy           = 5.0;
 		wanderJitter				= wanderJitterPerSec;
+		wanderJitterCpy             = 3.0;
 		wanderRadius				= wanderRad;
-		
-		//stuff for the wander behavior
+		wanderRadiusCpy             = 1.0;
 		double theta = Math.random() * (2* Math.PI);
+		wanderTargetCpy = new Vector2D(wanderRadiusCpy * Math.cos(theta), wanderRadiusCpy * Math.sin(theta));
+		//stuff for the wander behavior
+		
 
 		//create a vector to a target position on the wander circle
 		wanderTarget = new Vector2D(wanderRadius * Math.cos(theta), wanderRadius * Math.sin(theta));
@@ -332,14 +348,19 @@ public class SteeringBehaviors {
 		target = new Vector2D();
 		
 		wanderDistance				= wanderDist;
+		wanderDistanceCpy           = 5.0;
 		wanderJitter				= wanderJitterPerSec;
+		wanderJitterCpy             = 3.0;
 		wanderRadius				= wanderRad;
+		wanderRadiusCpy             = 1.0;
 		
 		//stuff for the wander behavior
 		double theta = Math.random() * (2* Math.PI);
 
 		//create a vector to a target position on the wander circle
 		wanderTarget = new Vector2D(wanderRadius * Math.cos(theta), wanderRadius * Math.sin(theta));
+		wanderTargetCpy = new Vector2D(wanderRadiusCpy * Math.cos(theta), wanderRadiusCpy * Math.sin(theta));	
+		
 				
 	}
 	
@@ -350,12 +371,16 @@ public class SteeringBehaviors {
 		this.aircraft_entity = aircraft; 	
 		
 		wanderDistance				= wanderDist;
+		wanderDistanceCpy           = 5.0;
 		wanderJitter				= wanderJitterPerSec;
+		wanderJitterCpy             = 3.0;
 		wanderRadius				= wanderRad;
+		wanderRadiusCpy             = 1.0;
 		
 		double theta = Math.random() * (2* Math.PI);
 		
-		wanderTarget = new Vector2D(wanderRadius * Math.cos(theta), wanderRadius * Math.sin(theta));	
+	    wanderTarget = new Vector2D(wanderRadius * Math.cos(theta), wanderRadius * Math.sin(theta));
+	    wanderTargetCpy = new Vector2D(wanderRadiusCpy * Math.cos(theta), wanderRadiusCpy * Math.sin(theta));	
 	}
 
 	public Vector2D calculate(){
