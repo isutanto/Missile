@@ -110,6 +110,8 @@ public class Missile extends MovingEntity {
 		}
 		
 		G0 = (int) (.0097 * mass);
+
+		//G0 = (int) (mass * 9.8);	// + BURNOUT * Gc//calculate weight using mass(kg) and the standard value of earth's gravity
 		steering = new SteeringBehaviors(this, target);
 		desiredAngle = curAngle = 90;
 		positionArray = new ArrayList<Vector2D>(10);
