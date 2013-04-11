@@ -137,7 +137,7 @@ public class SteeringBehaviors {
 	}
 	
 	public Vector2D flee(final Vector2D target){
-		System.out.println("in flee");
+		//System.out.println("in flee");
 		
 		final double panicDistSq = 100.0 * 100.0;
 		// change entity to myTarget
@@ -154,7 +154,7 @@ public class SteeringBehaviors {
 	}
 	
 	public Vector2D evade(Missile pursuer){
-		System.out.println("in evade");
+		//System.out.println("in evade");
 		
 		//change entity to myTarget
 		Vector2D toPursuer = (pursuer.pos()).sub(myTarget.pos());//(entity.pos());
@@ -167,7 +167,7 @@ public class SteeringBehaviors {
 	
 	public Vector2D wander() {
 		//first, add a small random vector to the target's position
-		System.out.println("in wander");
+		//System.out.println("in wander");
 	
 		//need to look at
 		

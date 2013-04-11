@@ -61,7 +61,7 @@ public class GameWorldModel extends AbstractModel {
 	
 			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
 	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 2, new Vector2D (0, 0), 5000, 
+			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 5, new Vector2D (0, 0), 5000, //modified from 5000 to 50 to reflect mass in kg.
 					new Vector2D(0, 0), 1, 2, aircraft);
 			
 			aircraft.getSteering().setTarget(missile); 
