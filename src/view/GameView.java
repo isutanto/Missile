@@ -460,7 +460,9 @@ private void gameRender()//(int x, int y)
   dbg.drawString("Current Angle: " + ((GameWorldModel)getModel()).getMissile().curAngle, 700, 80);
   dbg.drawString("Desired Angle: " +  (int) ((GameWorldModel)getModel()).getMissile().desiredAngle, 700, 95);
   dbg.drawString("Missile velocity: " + (int) ((GameWorldModel)getModel()).getMissile().velocity().x + ", " + (int) -((GameWorldModel)getModel()).getMissile().velocity().y, 700, 110);
- 
+  dbg.drawString("Aircraft velocity: " + (int) ((GameWorldModel)getModel()).getAircraft().velocity().x+ ", " + (int) -((GameWorldModel)getModel()).getAircraft().velocity().y, 700, 125);
+  
+  
   //Force values
   dbg.drawString("Time: " + (int) ((GameWorldModel)getModel()).getMissile().timeSeconds, 700, 345);
   dbg.drawString("Thrust: " + ((GameWorldModel)getModel()).getMissile().thrustForce, 700, 360);

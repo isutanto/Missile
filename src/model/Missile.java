@@ -41,7 +41,7 @@ public class Missile extends MovingEntity {
  */
 public class Missile extends MovingEntity {
 	
-	public static final int BLAST_RADIUS = 30;
+	public static final int BLAST_RADIUS = 20;
 	
 	public Vector2D gForce;
 	
@@ -65,7 +65,7 @@ public class Missile extends MovingEntity {
 	public double totalTime;
 	
 	//total time elapsed in seconds
-	public double timeSeconds;
+	public static double timeSeconds;
 	
 	//Missile's forces
 	private Vector2D lift;
@@ -119,7 +119,7 @@ public class Missile extends MovingEntity {
 	boolean calledOnce;
 // Addition to self destruct 
 	public int engage = 0;
-	public int engageDist = 100;
+	public int engageDist = 200;  // half of detectionDist in Aircraft
 	public int missDist = 1500;
 	
 	
@@ -186,8 +186,10 @@ public class Missile extends MovingEntity {
 			
 			//add accelerations to velocity -- (multiply by delta t -- )
 			velocity = velocity.add(accel.mul(delta));
-			velocity.truncate(this.maxSpeed);
 			
+			System.out.println("Missile velocity " + velocity);
+			velocity.truncate(this.maxSpeed);
+			System.out.println("Missile velocity after being truncate " + velocity);
 		}else{
 			thrustForce = 0;
 			dragForce = 0;
@@ -429,9 +431,9 @@ public class Missile extends MovingEntity {
 	
 	private void updateState(double timeSeconds) {
 		if(timeSeconds < BURNOUT && state != State.MISSED){// && state!= State.SELFDESTRUCT){
-			System.out.println("State is != MISSED");
+			//System.out.println("State is != MISSED");
 //			state = State.ACCEL;
-			System.out.println("State: "+state);
+			//System.out.println("State: "+state);
 		}
 		else if (state != State.EXPLODE && state!=State.MISSED) 
 			state = State.FREEFALL;

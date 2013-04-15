@@ -148,7 +148,7 @@ public class SteeringBehaviors {
 	public Vector2D flee(final Vector2D target){
 		System.out.println("in flee");
 		
-		final double panicDistSq = 100.0 * 100.0;
+		final double panicDistSq = aircraft_entity.detectionDist * aircraft_entity.detectionDist/4;
 		if(aircraft_entity.pos().distanceSq(target) > panicDistSq){
 			return new Vector2D();
 		}
@@ -157,7 +157,8 @@ public class SteeringBehaviors {
 		System.out.println("Desired velocity for the Aircraft = " + desiredVelocity);
 		desiredVelocity.normalize();
 		desiredVelocity = desiredVelocity.mul(aircraft_entity.maxForce());
-		
+		System.out.println("Desired velocity after multiplied to the Aircraft Max Force = " + desiredVelocity);
+		System.out.println("Current aircraft velocity = " + aircraft_entity.velocity());
 		return (desiredVelocity.sub(aircraft_entity.velocity()));	
 	}
 	
@@ -172,26 +173,26 @@ public class SteeringBehaviors {
 	public Vector2D wander()
 	{
 		//first, add a small random vector to the target's position
-		System.out.println("in wander");
-		System.out.println("WanderTargetCpy Before: "+wanderTargetCpy);
+		//System.out.println("in wander");
+		//System.out.println("WanderTargetCpy Before: "+wanderTargetCpy);
 		wanderTargetCpy = wanderTargetCpy.add(new Vector2D( new Random().nextDouble()* wanderJitterCpy,
 				new Random().nextDouble() * wanderJitterCpy));
-		System.out.println("WanderTargetCpy After: "+wanderTargetCpy);
-		System.out.println("Random #"+new Random().nextDouble());
+		//System.out.println("WanderTargetCpy After: "+wanderTargetCpy);
+		//System.out.println("Random #"+new Random().nextDouble());
 		//reproject this new vector back on to a unit circle
 		wanderTargetCpy.normalize();
 		//increase the length of the vector to the same as the radius
 		//of the wander circle
 		wanderTargetCpy = wanderTargetCpy.mul(wanderRadiusCpy);
-		System.out.println("WanderTargetCpy.mul"+wanderTargetCpy);
+		//System.out.println("WanderTargetCpy.mul"+wanderTargetCpy);
 		//move the target into a position WanderDist in front of the agent
 		Vector2D target2 = wanderTargetCpy.add(new Vector2D(wanderDistanceCpy, 0));
-		System.out.println("Target2:"+target2);
+		//System.out.println("Target2:"+target2);
 		//project the target into world space
 		Vector2D newTarget = Transformations.pointToLocalSpace(target2, aircraft_entity.heading(), aircraft_entity.side(), aircraft_entity.pos());
 		//and steer towards it
 		//return newTarget.sub(entity.pos());
-		System.out.println("NewTarget: "+newTarget);
+		//System.out.println("NewTarget: "+newTarget);
 		return newTarget.mul(-1);
 	}
 	
