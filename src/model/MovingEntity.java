@@ -8,6 +8,8 @@ public abstract class MovingEntity extends BaseGameEntity {
 	 */
 	protected Vector2D heading;
 	
+	public SteeringBehaviors steering;
+	
 	/**
 	 * a vector perpendicular to the heading vector
 	 */

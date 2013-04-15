@@ -1,18 +1,13 @@
+
 package model;
 
 import java.awt.MouseInfo;
 import java.io.IOException;
+import java.lang.annotation.Target;
 import java.util.*;
 import javax.imageio.ImageIO;
 
-/**
- * 
- * @author Jason Herzog / Claudia Alvarado
- *
- *Missile class models the physics of a missile. Missile class contains an instance of SteeringBehaviors to model
- *different guidance algorithms.
- *
- */
+/*
 public class Missile extends MovingEntity {
 	
 	public static final int BLAST_RADIUS = 30;
@@ -30,12 +25,41 @@ public class Missile extends MovingEntity {
 	public Guidance guide;
 	
 	//Set to true if the mouse was clicked within the missile
-	public boolean isPressed;
+	public boolean isPressed;*/
 	
 	//time for engine to burnout
 
-	public static final long BURNOUT = 12;
 
+
+/**
+ * 
+ * @author Jason Herzog / Claudia Alvarado
+ *
+ *Missile class models the physics of a missile. Missile class contains an instance of SteeringBehaviors to model
+ *different guidance algorithms.
+ *
+ */
+public class Missile extends MovingEntity {
+	
+	public static final int BLAST_RADIUS = 30;
+	
+	public Vector2D gForce;
+	
+	public enum State {
+		ACCEL, FREEFALL, GROUND, EXPLODE, MISSED, SELFDESTRUCT
+	}
+	public State state;
+	
+	public enum Guidance{
+		PROPOTIONAL, PURSUIT, PARALLEL, NONE
+	}
+	public Guidance guide;
+	
+	//Set to true if the mouse was clicked within the missile
+	public boolean isPressed;
+	
+	//time for engine to burnout
+	public static final long BURNOUT = 50;
 	
 	//total time elapsed in nanoseconds
 	public double totalTime;
@@ -59,6 +83,9 @@ public class Missile extends MovingEntity {
 	//Array of positions 
 	public ArrayList<Vector2D> positionArray;
 	public ArrayList<Double> speedArray;
+	
+//	private static final double MISSED_SPEEDUP = 2.0;
+//	private static final double MISSED_ANGLE = -255.0;
 	
 	//Equation constants
 	//Lift force
@@ -90,7 +117,12 @@ public class Missile extends MovingEntity {
 	//add max angle turn speed
 	
 	boolean calledOnce;
-
+// Addition to self destruct 
+	public int engage = 0;
+	public int engageDist = 100;
+	public int missDist = 1500;
+	
+	
 	public Missile(Vector2D position,
 			double radius,
 			Vector2D velocity,
@@ -98,7 +130,7 @@ public class Missile extends MovingEntity {
 			Vector2D heading,
 			double mass,
 			Vector2D scale,
-			double turnRate,
+			double turnRate,		
 			double maxForce, MovingEntity target) {
 		super(position, radius, velocity, maxSpeed, heading, mass,
 						scale, turnRate, maxForce);
@@ -125,6 +157,68 @@ public class Missile extends MovingEntity {
 
 	}
 	
+
+	public void update(MovingEntity target, double delta) {
+		totalTime += delta;
+		timeSeconds = totalTime/1000000000L;
+		
+		//calculate forces
+		calculateThrust();
+		calculateLift();
+		calculateDrag();
+		calculateWeight(totalTime);
+        //add up, calculate acceleration/position
+		
+		if(state == State.ACCEL || state == State.MISSED){
+			thrustForce = (int) thrust.x;
+			dragForce = (int) drag.x;
+			liftForce = (int) lift.x;
+		
+			//convert forces into acceleration
+		
+			Vector2D accel4 = new Vector2D (0, -weight/mass);
+		
+		    Vector2D force = thrust.add(lift);
+		    force = force.add(drag);
+		    force = force.add(accel4);
+		    Vector2D accel = force.div(mass);
+			//add vector /mass * delta t
+			
+			//add accelerations to velocity -- (multiply by delta t -- )
+			velocity = velocity.add(accel.mul(delta));
+			velocity.truncate(this.maxSpeed);
+			
+		}else{
+			thrustForce = 0;
+			dragForce = 0;
+			liftForce = 0;
+		}
+		
+		getDesiredAngle();
+		adjustCurAngle();
+		updateState(timeSeconds);
+		updatePosition();
+	
+		//update array
+		
+		if(positionTimeCount < timeSeconds){ //add a point to be drawn every .5 seconds
+			positionTimeCount += .5;
+			positionArray.add(new Vector2D(position));
+		}
+		
+		
+		//if the vehicle has a non zero velocity the heading and side vectors must 
+		//be updated
+		if (!velocity.isZero())
+		{    
+			heading = new Vector2D(velocity);
+			heading.normalize();
+			
+			side = heading.perp();
+		}
+}
+	
+/*	
 	public void update(MovingEntity target, double delta) {
 		totalTime += delta;
 		timeSeconds = totalTime/1000000000L;
@@ -188,10 +282,49 @@ public class Missile extends MovingEntity {
 			
 			speedArray.add(velocity.length());
 		}
-}
+}*/
 
+	/*
 	private void updatePosition() {
 		if(state == State.GROUND || state == State.EXPLODE)
+			velocity.Zero();
+		else if (state == State.ACCEL){
+			System.out.println("Accel State");
+			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
+			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle));	
+		}else if (state == State.FREEFALL){
+			System.out.println("FreeFall State");
+			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
+			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
+		}
+		else if (state == State.MISSED){
+			System.out.println("Missed State");
+			//desiredAngle = missile heading and aircraft position
+			double x;
+			double y;
+			x = steering.myTarget.pos().x;
+			y = steering.myTarget.pos().y; 
+			Vector2D temp = new Vector2D (x, y);
+			
+			//Vector2D temp = steering.myTarget.pos();
+			temp.normalize();
+			desiredAngle = Math.toDegrees(Math.acos(heading.dot(temp)));
+			Vector2D w1;
+			//w1 = steering.wander();
+			w1 = steering.myTarget.steering.wander();
+			System.out.println("w1:"+w1);
+			Vector2D w2;
+		    w2 = w1.sub(position);
+		    w2.normalize();
+		    w2 = w2.mul(velocity.length() * MISSED_SPEEDUP);
+			position = position.add(w2);
+		}
+	}*/
+	
+	
+
+	private void updatePosition() {
+		if(state == State.GROUND || state == State.EXPLODE || state == State.SELFDESTRUCT)
 			velocity.Zero();
 		else if (state == State.ACCEL){
 			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
@@ -201,7 +334,8 @@ public class Missile extends MovingEntity {
 			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
 		}
 	
-		
+		if(this.distanceToTarget()< engageDist)
+			engage++;
 		
 	}
 	
@@ -219,10 +353,11 @@ public class Missile extends MovingEntity {
 		
 		if(state == State.FREEFALL)
 			desiredAngle = -90;
-		else if(state == State.GROUND || state == State.EXPLODE)
+		else if(state == State.GROUND || state == State.EXPLODE || state == State.SELFDESTRUCT)
 			desiredAngle = curAngle;
 		
 	}
+	
 	
 	private void adjustCurAngle(){
 		 if((int) desiredAngle < curAngle)
@@ -230,8 +365,6 @@ public class Missile extends MovingEntity {
 		else if((int)desiredAngle > curAngle)
 			curAngle += TURN_RATE;
 	}
-	
-	
 	
 	
 	public double getAngle(Vector2D targetPos) { 
@@ -243,8 +376,11 @@ public class Missile extends MovingEntity {
 	    return angle - 90; 
 	
 	}
+	
+	
+	
 //Modify Weight Calculation:
-	/*private void calculateWeight() {
+/*	private void calculateWeight() {
 		double percent;
 		if(position.y < 0)
 			percent = .90;
@@ -269,6 +405,7 @@ public class Missile extends MovingEntity {
 		weight = (int) (G0*percent);
 		
 	}*/
+
 	private void calculateWeight(double dTime){
 		if(weight == 0){
 			weight = G0-((Gc/1000000000L) * dTime);
@@ -278,6 +415,41 @@ public class Missile extends MovingEntity {
 		}
 	}
 
+	
+	public void setGuidance(String option) {
+		if(option == "pursuit")
+			guide = Guidance.PURSUIT;
+		else if(option == "parallel")
+			guide = Guidance.PARALLEL;
+		else if (option == "proportional")
+			guide = Guidance.PROPOTIONAL;
+		
+	}	
+	
+	
+	private void updateState(double timeSeconds) {
+		if(timeSeconds < BURNOUT && state != State.MISSED){// && state!= State.SELFDESTRUCT){
+			System.out.println("State is != MISSED");
+//			state = State.ACCEL;
+			System.out.println("State: "+state);
+		}
+		else if (state != State.EXPLODE && state!=State.MISSED) 
+			state = State.FREEFALL;
+		
+		
+		//Self Destruct the missile 
+		if ((this.distanceToTarget()>= missDist) && (engage > 0) && ((BURNOUT-timeSeconds)>10)){
+			System.out.println("Self destruct initiated..!! 3.. 2.. 1....");
+			state = State.SELFDESTRUCT;
+		}
+		
+		if(position.y >= GameWorldModel.GROUND.y)
+			state = State.GROUND;
+		
+			
+	}
+	
+/*
 	private void updateState(double timeSeconds) {
 		if(timeSeconds < BURNOUT)
 			state = State.ACCEL;
@@ -287,7 +459,8 @@ public class Missile extends MovingEntity {
 			state = State.GROUND;
 		
 			
-	}
+	}*/
+
 
 	private void calculateLift() {
 		lift = velocity.sq();	// V sqr
@@ -297,6 +470,29 @@ public class Missile extends MovingEntity {
 		lift = lift.mul(Cy);	// (((p * V2)/2)S)Cy
 		lift.y = -lift.y;
 	}
+	
+	/*	
+	private void calculateThrust(){
+		if(position.y < 150)
+			Ph = 7;
+		else if(position.y < 250)
+			Ph = 5;
+		else if (position.y < 350)
+			Ph = 2;
+		else if (position.y < 450)
+			Ph = 1;
+
+		double Pf = (Pc - Ph);
+		double temp = (Gc * u)/g;
+		temp += Pf*Sb;
+		thrust = new Vector2D(temp, -temp); //magnitude -- vector along normalize angle multiply temp
+		//thrust = new Vector2D(Math.cos(Math.toRadians(curAngle)), -Math.sin(Math.toRadians(curAngle)));
+		System.out.println(thrust);
+		thrust.mul(temp);
+		System.out.println("Temp"+temp);
+		System.out.println("CurAngle"+curAngle);
+		
+	} //x,y coordinates from sin and cos -> normalized vector*/
 	
 	private void calculateThrust(){
 		if(position.y < 150)
@@ -313,6 +509,7 @@ public class Missile extends MovingEntity {
 		temp += Pf*Sb;
 		thrust = new Vector2D(temp, -temp);
 	}
+		
 	
 	private void calculateDrag(){
 		drag = velocity.sq();
@@ -334,6 +531,10 @@ public class Missile extends MovingEntity {
 		state = newState;
 	}
 	
+	public State getMissileState(){
+		return state;
+	}
+	
 	public double distanceToTarget(){
 		return position.distance(steering.getMyTarget().pos());
 	}
@@ -345,15 +546,6 @@ public class Missile extends MovingEntity {
 		
 	}
 
-	public void setGuidance(String option) {
-		if(option == "pursuit")
-			guide = Guidance.PURSUIT;
-		else if(option == "parallel")
-			guide = Guidance.PARALLEL;
-		else if (option == "proportional")
-			guide = Guidance.PROPOTIONAL;
-		
-	}
 
 	public void dragMissile() {
 		//position.x = MouseInfo.getPointerInfo().getLocation().x;		
@@ -363,9 +555,4 @@ public class Missile extends MovingEntity {
 		return speedArray;
 	}
 	
-	public State getMissileState()
-	{
-		return state;
-	}
-
 }

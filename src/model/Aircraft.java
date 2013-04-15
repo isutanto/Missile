@@ -22,6 +22,8 @@ public class Aircraft extends MovingEntity {
 	public int N = 40;
 	public int randomInt; 
 	
+	public Vector2D gForce;
+	
 	// Angle of maneuver for aircraft add on
 	/*
 	public double curAngle=0;	
@@ -77,14 +79,28 @@ public class Aircraft extends MovingEntity {
 		
 		//Vector2D force = steering.calculate();
 		
-		//double distance = this.position.distance(missile.pos());
 		
-		if(this.position.distance(missile.pos()) < 250 && missile.getMissileState() != State.EXPLODE)//800)
+		double distance = this.position.distance(missile.pos());
+		System.out.println("Distance to Missile : " + distance);
+		
+		System.out.println("Missile position X: " + missile.pos().x);
+		System.out.println("Missle position y: " + missile.pos().y);
+		System.out.println("This position X: " + this.position.x);
+		System.out.println("This position y: " + this.position.y);
+		
+		
+		if(this.position.distance(missile.pos()) < 250 && (missile.getMissileState() != State.EXPLODE || missile.getMissileState() != State.SELFDESTRUCT))//800)
 		{
 			steering.evade(missile);
 			//update velocity when doing the evade or flee   need to improve the evasion technique
 			velocity = steering.getMyTarget().velocity;
-
+			
+			
+			//velocity = steering.evade(missile);
+			
+			System.out.println("Velocity in Aircraft " + velocity);
+			//velocity.truncate(maxSpeed);
+			
 			// Randomize the evasion technique
 			if (N == 40)
 			{
@@ -94,7 +110,8 @@ public class Aircraft extends MovingEntity {
 			}
 			
 			//position = position.evasionLoop(velocity,this.maxForce(),-90);
-			position = position.evasionUp(velocity,this.maxForce());
+			//position = position.evasionUp(velocity,this.maxForce());
+			//position = position.add(velocity);
 			
 			/*
 			if ((this.pos().y - missile.pos().y) > 0 )
@@ -102,18 +119,31 @@ public class Aircraft extends MovingEntity {
 			else
 				position = position.evasionUp(velocity,this.maxForce());*/
 			
-			/*
+			
 			if (randomInt < 4)
 				{
-					position = position.evasionDown(velocity,this.maxForce());
+					Vector2D temp = position;
+					if (position.sub(missile.pos()).y >= 0)
+						position = position.evasionDown(velocity,this.maxForce());
+					else
+						position = position.evasion(velocity, this.maxForce());
+					if (position.distance(temp)> 20)
+							System.out.println("Change of position more than : " + steering.wanderDist);
 					N++;
 				}
-			else if (randomInt >= 4 && randomInt < 7)
-				{
-					position = position.evasionUp(velocity,this.maxForce());
+			else //if (randomInt >= 4 && randomInt < 7)
+				{	
+					Vector2D temp = position;
+					if (position.sub(missile.pos()).y < 0)
+						position = position.evasionUp(velocity,this.maxForce());
+					else
+						position = position.evasion(velocity, this.maxForce());
+					
+					if (position.distance(temp)> 20)
+						System.out.println("Change of position more than : " + steering.wanderDist);
 					N++;
 				}
-			else
+			/*else
 				{
 					position = position.evasionLoop(velocity,10,80);
 					N++;

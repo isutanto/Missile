@@ -1,3 +1,4 @@
+
 package model;
 
 
@@ -7,6 +8,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import model.Missile.State;
 
 import view.GameView;import java.awt.image.*;
 import java.awt.*;
@@ -61,7 +64,7 @@ public class GameWorldModel extends AbstractModel {
 	
 
 			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 3.0);
+	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 5.0);
 			missile = new Missile(new Vector2D (200, 400), 10, new Vector2D(0, 0), 2, new Vector2D (0, 0), 5000, 
 					new Vector2D(0, 0), 1.0, 5.0, aircraft);
 			
@@ -232,13 +235,20 @@ public void update() {
 		missile.image = kaboom;
 	    missile.state = Missile.State.EXPLODE;
 	}
-	
+
 	if(missile.position.distance(aircraft.position) <= Missile.BLAST_RADIUS){
 		missile.image = kaboom;
 		aircraft.image=kaboom;   
 		missile.velocity.Zero();
 		aircraft.velocity.Zero();
 		missile.state = Missile.State.EXPLODE;
+	}
+	
+	if(missile.getMissileState() == State.SELFDESTRUCT)
+	{
+		//System.out.println("Missile state is " + missile.getMissileState());
+		missile.image = kaboom;
+		//missile.state = Missile.State.EXPLODE;
 	}
 		
 	lastCall = System.nanoTime();
@@ -251,3 +261,7 @@ public BufferedImage boom(){return kaboom;}
 public int getMapX(){ return MAPX;}
 public int getMapY(){ return MAPY;}
 }
+
+
+//}
+

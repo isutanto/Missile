@@ -289,7 +289,7 @@ private void gameRender()//(int x, int y)
 	double x = (double) ((GameWorldModel)getModel()).getMissile().timeSeconds;
 	timeArray.add(x);
 	
-	if(!askForDump && ((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+	if(!askForDump && (((GameWorldModel)getModel()).getMissile().state == State.EXPLODE || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT))
 	{
 		System.out.println("Click for chart creation.");
 		
@@ -417,7 +417,7 @@ private void gameRender()//(int x, int y)
 	 
 	 //Stop moving missile once it explodes (used for dragView())
 
-	 if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+	 if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT)
 		  affineTransform.setToTranslation(missilePosx - camx + 395,
 					missilePosy + camy - 583);
 			
@@ -425,7 +425,7 @@ private void gameRender()//(int x, int y)
 	 
 
 	 //If missile explodes, stop drawing aircraft
-	 if(((GameWorldModel)getModel()).getMissile().state != State.EXPLODE)	 
+	 if((((GameWorldModel)getModel()).getMissile().state != State.EXPLODE) || (((GameWorldModel)getModel()).getMissile().state != State.SELFDESTRUCT))	 
 	 drawImage(dbg, aircraftImage, aircraftPosx, aircraftPosy);
 	  
   dbg.setFont(new Font(Font.DIALOG, Font.BOLD, 15));
@@ -471,7 +471,7 @@ private void gameRender()//(int x, int y)
  // dbg.drawString("G-Force: " + (int) ((GameWorldModel)getModel()).getMissile().gForce.y, 900, 460);
 
   
-  if((((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)&& chartsCreated == false)
+  if(((((GameWorldModel)getModel()).getMissile().state == State.EXPLODE) || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT )&& chartsCreated == false)
 	{
 	    if(!drawMe) 
 		   drawMe = true;
@@ -500,6 +500,7 @@ private void gameUpdate(){
 
 	if(!isPaused && guidanceSelected && ((GameWorldModel)getModel()).getMissile().getMissileState()!= State.EXPLODE)
 	//if(!isPaused )
+		if(((GameWorldModel)getModel()).getMissile().state != State.SELFDESTRUCT)
 		((GameWorldModel)getModel()).update();
 	/*else if (((GameWorldModel)getModel()).getMissile().isPressed)
 		((GameWorldModel)getModel()).getMissile().dragMissile();
@@ -574,7 +575,7 @@ public void resumeGame(){
 	
 public void dragView()
 {
-    if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+    if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT)
 	{
 	   int ydif = 0;
 	   int xdif = 0;
@@ -596,14 +597,14 @@ public void dragView()
 	//@Override
 	public void mousePressed(MouseEvent me) {
 		
-		if(!dump && ((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		if(!dump && (((GameWorldModel)getModel()).getMissile().state == State.EXPLODE || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT))
 		{
 				dumpCharts();
 				dump = true;
 		}
 		
 	
-		if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
+		if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT)
 		{
 				  mouseAction = true;
 				  mxLast =  MouseInfo.getPointerInfo().getLocation().x;
