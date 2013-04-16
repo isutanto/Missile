@@ -41,7 +41,7 @@ public class Missile extends MovingEntity {
  */
 public class Missile extends MovingEntity {
 	
-	public static final int BLAST_RADIUS = 20;
+	public static final int BLAST_RADIUS = 35;
 	
 	public Vector2D gForce;
 	
@@ -77,14 +77,14 @@ public class Missile extends MovingEntity {
 	public int dragForce;
 	public int thrustForce;
 	
-	private static final double TURN_RATE = 1; // angle turn rate
+	private static final double TURN_RATE = 2; // angle turn rate
 	private static final int COOLDOWN = 2; //time missile flies at 90 degrees until guidance kicks in
 	
 	//Array of positions 
 	public ArrayList<Vector2D> positionArray;
 	public ArrayList<Double> speedArray;
 	
-//	private static final double MISSED_SPEEDUP = 2.0;
+	private static final double MISSED_SPEEDUP = 2.0;
 //	private static final double MISSED_ANGLE = -255.0;
 	
 	//Equation constants
@@ -217,7 +217,9 @@ public class Missile extends MovingEntity {
 			heading.normalize();
 			
 			side = heading.perp();
+			speedArray.add(velocity.length());
 		}
+		
 }
 	
 /*	
@@ -286,7 +288,7 @@ public class Missile extends MovingEntity {
 		}
 }*/
 
-	/*
+	
 	private void updatePosition() {
 		if(state == State.GROUND || state == State.EXPLODE)
 			velocity.Zero();
@@ -321,10 +323,13 @@ public class Missile extends MovingEntity {
 		    w2 = w2.mul(velocity.length() * MISSED_SPEEDUP);
 			position = position.add(w2);
 		}
-	}*/
+		
+		if(this.distanceToTarget()< engageDist)
+			engage++;
+	}
 	
 	
-
+/*
 	private void updatePosition() {
 		if(state == State.GROUND || state == State.EXPLODE || state == State.SELFDESTRUCT)
 			velocity.Zero();
@@ -339,7 +344,7 @@ public class Missile extends MovingEntity {
 		if(this.distanceToTarget()< engageDist)
 			engage++;
 		
-	}
+	}*/
 	
 
 	private void getDesiredAngle() {

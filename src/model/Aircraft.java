@@ -19,10 +19,12 @@ public class Aircraft extends MovingEntity {
 	public boolean isPressed;
 	
 	// Itteration on random evasion
-	public int N = 40;
+	public int N = 30;
 	public int randomInt; 
+	public int randomSelct;
+	public int odd = 0;
 	
-	public int detectionDist = 400;
+	public int detectionDist = 300;
 	public Vector2D gForce;
 	
 	// Angle of maneuver for aircraft add on
@@ -77,10 +79,7 @@ public class Aircraft extends MovingEntity {
 	
 
 	public void update(Missile missile, double delta) {
-		
-		//Vector2D force = steering.calculate();
-		
-		
+				
 		double distance = this.position.distance(missile.pos());
 		/*System.out.println("Distance to Missile : " + distance);
 		
@@ -88,83 +87,29 @@ public class Aircraft extends MovingEntity {
 		System.out.println("Missle position y: " + missile.pos().y);
 		System.out.println("This position X: " + this.position.x);
 		System.out.println("This position y: " + this.position.y);*/
-		
-		
+				
 		if(this.position.distance(missile.pos()) < detectionDist && (missile.getMissileState() != State.EXPLODE || missile.getMissileState() != State.SELFDESTRUCT))//800)
 		{
-			
 			Vector2D evadeVelocity = steering.evade(missile);
-			//update velocity when doing the evade or flee   need to improve the evasion technique
-			//velocity = steering.getMyTarget().velocity;
+
 			evadeVelocity = evadeVelocity.absX();
-			System.out.println("evadeVelocity for aircraft " + evadeVelocity);
-			System.out.println("Curent velocity " + velocity);
+			//System.out.println("evadeVelocity for aircraft " + evadeVelocity);
+			//System.out.println("Curent velocity " + velocity);
 			
 			if (!evadeVelocity.isZero())
 				velocity = velocity.add(evadeVelocity);
 			
 			
-			System.out.println("Velocity in Aircraft " + velocity);
+			//System.out.println("Velocity in Aircraft " + velocity);
 			velocity.truncate(maxSpeed);
 			
-
-			
-			updateAircraftPos(1);
-			
-			/*
-			if ((this.pos().y - missile.pos().y) > 0 )
-				position = position.evasionDown(velocity,this.maxForce());
-			else
-				position = position.evasionUp(velocity,this.maxForce());*/
-			
-			/*
-			if (randomInt < 4)
-				{
-					Vector2D temp = position;
-					if (position.sub(missile.pos()).y >= 0){
-						double groundDetect = this.position.y - GameWorldModel.GROUND.y;
-						System.out.println("Distance to ground " + groundDetect);
-						if ( (int) groundDetect > 10)
-							position = position.evasionDown(velocity,this.maxForce());
-							else
-							{
-								position = position.evasionUp(velocity,this.maxForce());
-								N=39;
-							}
-					}
-						
-					else
-						position = position.evasion(velocity, this.maxForce());
-					if (position.distance(temp)> 20)
-							System.out.println("Change of position more than : " + steering.wanderDist);
-					N++;
-				}
-			else //if (randomInt >= 4 && randomInt < 7)
-				{	
-					Vector2D temp = position;
-					if (position.sub(missile.pos()).y < 0)
-						position = position.evasionUp(velocity,this.maxForce());
-					else
-						position = position.evasion(velocity, this.maxForce());
-					
-					if (position.distance(temp)> 20)
-						System.out.println("Change of position more than : " + steering.wanderDist);
-					N++;
-				}*/
-			/*else
-				{
-					position = position.evasionLoop(velocity,10,80);
-					N++;
-				}*/
-				
-		}
-				
+			updateAircraftPos(0);	
+		}				
 		else
 		{
-
 			steering.wander();
+			velocity.truncate(maxSpeed);
 			updateAircraftPos(0);
-			//position = position.add(velocity);
 		}
 		
 		
@@ -175,7 +120,7 @@ public class Aircraft extends MovingEntity {
 		//velocity = steering.getMyTarget().velocity;
 			
 		//make sure vehicle does not exceed maximum velocity per second
-		velocity.truncate(maxSpeed);
+		//velocity.truncate(maxSpeed);
 
 		//update the position
 		/*if ((this.pos().y - missile.pos().y) < 0 )
@@ -211,47 +156,37 @@ public class Aircraft extends MovingEntity {
 		position.x = MouseInfo.getPointerInfo().getLocation().x;
 		position.y = MouseInfo.getPointerInfo().getLocation().y;
 	}
-	
-
-	
+		
 	private void updateAircraftPos(int choice) {
 		
 
 		if (choice == 0){
 			position.x = position.x + velocity.x* Missile.timeSeconds;
 			position.y = position.y + velocity.y * Missile.timeSeconds;
+			if (position.y > 360)
+				position.y = 360;
 		}
 		else
 		{
-			// Randomize the evasion technique
-			if (N == 40)
-			{
-				Random rand;//, angle;
-				rand = new Random();
-				randomInt = rand.nextInt(10);
-				//angle = new Random();
-				//randomInt = rand.nextInt(90);
-				N = 0;
-			}
+			Random rand;
+			rand = new Random();
+			randomSelct = rand.nextInt(2);
 			
-			if (randomInt <= 5)
+			if(randomSelct <=1)
 			{
-				position.x = position.x + (velocity.x * Math.cos(Math.toRadians(45)) * Missile.timeSeconds);
-				position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(45));
-				N++;
+				Swerve();
 			}
-		else //if (randomInt >= 4 && randomInt < 7)
-			{	
-				position.x = position.x + (velocity.x * Math.cos(Math.toRadians(-45)) * Missile.timeSeconds);
-				if(position.y > -10)
-					position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(-45));
-				else
-				{
-					position.y = position.y + velocity.y*Missile.timeSeconds;
-					N = 39;
-				}
-				N++;
+			else //if ((1 < randomSelct) && (randomSelct <= 2) )
+			{
+				position.x = position.x + velocity.x* Missile.timeSeconds;
+				position.y = position.y + velocity.y * Missile.timeSeconds;
+				if (position.y > 360)
+					position.y = 360;
 			}
+			/*else
+			{
+				// loopy do dah
+			}*/
 
 		}
 	}
@@ -260,6 +195,42 @@ public class Aircraft extends MovingEntity {
 	public void render() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void Swerve()
+	{
+		// Randomize the evasion technique
+					if (N == 30)
+					{
+						Random rand;//, angle;
+						rand = new Random();
+						randomInt = rand.nextInt(10);
+						odd = (randomInt - 1)%2;
+						N = 0;
+					}
+					
+					if (odd != 0)
+					{
+						position.x = position.x + (velocity.x * Math.cos(Math.toRadians(45)) * Missile.timeSeconds);
+						position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(45));
+						if (position.y > 360){
+							position.y = 360;
+							//N = 29;
+							odd = 1;
+						}
+
+						N++;
+					}
+				else 
+					{	
+						position.x = position.x + (velocity.x * Math.cos(Math.toRadians(-45)) * Missile.timeSeconds);
+						position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(-45));
+						//System.out.println("Y position is " + position.y);
+
+						// check for ground
+							
+						N++;
+					}		
 	}
 
 }
