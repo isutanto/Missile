@@ -19,10 +19,11 @@ public class Aircraft extends MovingEntity {
 	public boolean isPressed;
 	
 	// Itteration on random evasion
-	public int N = 30;
+	public int N = 50;
 	public int randomInt; 
 	public int randomSelct;
 	public int odd = 0;
+	public int finish = 0;
 	
 	public int detectionDist = 300;
 	public Vector2D gForce;
@@ -55,6 +56,7 @@ public class Aircraft extends MovingEntity {
 		steering.wanderOn();
 		steering.evadeOn();
 		steering.fleeOn();
+		
 		
 	}
 	
@@ -93,8 +95,20 @@ public class Aircraft extends MovingEntity {
 			Vector2D evadeVelocity = steering.evade(missile);
 
 			evadeVelocity = evadeVelocity.absX();
-			//System.out.println("evadeVelocity for aircraft " + evadeVelocity);
-			//System.out.println("Curent velocity " + velocity);
+		
+			Vector2D curVelocity = velocity;
+			
+			double speed = curVelocity.length();
+			System.out.println("Current speed " + velocity);
+			double desiredSpeed = evadeVelocity.length();
+			System.out.println("Desired speed " + evadeVelocity);
+		
+			Vector2D acc = (evadeVelocity.sub(velocity)).div(System.nanoTime() - GameWorldModel.lastCall);
+			System.out.println("Desired acc " + acc);
+			System.out.println("Desired acc scalar " + acc.length());
+			//double acc = (desiredSpeed - speed)/();
+			//System.out.println("Acc needed " + acc * 10000000);
+
 			
 			if (!evadeVelocity.isZero())
 				velocity = velocity.add(evadeVelocity);
@@ -103,7 +117,7 @@ public class Aircraft extends MovingEntity {
 			//System.out.println("Velocity in Aircraft " + velocity);
 			velocity.truncate(maxSpeed);
 			
-			updateAircraftPos(0);	
+			updateAircraftPos(1);	
 		}				
 		else
 		{
@@ -168,13 +182,19 @@ public class Aircraft extends MovingEntity {
 		}
 		else
 		{
+			if (finish == 0){
 			Random rand;
 			rand = new Random();
 			randomSelct = rand.nextInt(2);
+			finish = 1;
+			}
 			
 			if(randomSelct <=1)
 			{
 				Swerve();
+				N++;
+				if( N == 50)
+					finish = 0;
 			}
 			else //if ((1 < randomSelct) && (randomSelct <= 2) )
 			{
@@ -202,24 +222,27 @@ public class Aircraft extends MovingEntity {
 		// Randomize the evasion technique
 					if (N == 30)
 					{
-						Random rand;//, angle;
-						rand = new Random();
-						randomInt = rand.nextInt(10);
-						odd = (randomInt - 1)%2;
+						//Random rand;//, angle;
+						//rand = new Random();
+						//randomInt = rand.nextInt(10);
+						if (odd == 0)
+							odd = 1;
+						else
+							odd = 0;
 						N = 0;
 					}
 					
-					if (odd != 0)
+					if (odd == 0)
 					{
 						position.x = position.x + (velocity.x * Math.cos(Math.toRadians(45)) * Missile.timeSeconds);
 						position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(45));
 						if (position.y > 360){
 							position.y = 360;
-							//N = 29;
-							odd = 1;
+							N = 49;
+							//odd = 1;
 						}
 
-						N++;
+						//N++;
 					}
 				else 
 					{	
@@ -229,7 +252,7 @@ public class Aircraft extends MovingEntity {
 
 						// check for ground
 							
-						N++;
+						//N++;
 					}		
 	}
 

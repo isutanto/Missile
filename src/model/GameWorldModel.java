@@ -31,7 +31,7 @@ public class GameWorldModel extends AbstractModel {
 	BufferedImage background;
 	BufferedImage i1,i2,i3,i4,i5,i6,i7;
 	BufferedImage kaboom;
-	public long lastCall;
+	public static long lastCall;
 	private int MAP[][]; 
 	private int MAPX = 20;
 	private int MAPY = 20;
@@ -64,8 +64,8 @@ public class GameWorldModel extends AbstractModel {
 	
 
 			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(3, 0), 3.3, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 5.0);
-			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 5, new Vector2D (0, 0), 5000, 
+	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(3, 0), 5.5, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 5.0);
+			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 5.6, new Vector2D (0, 0), 5000, 
 					new Vector2D(5, 5), 1.0, 5.0, aircraft);
 			
 			aircraft.getSteering().setTarget(missile); 
@@ -248,7 +248,6 @@ public void update() {
 	{
 		//System.out.println("Missile state is " + missile.getMissileState());
 		missile.image = kaboom;
-		//missile.state = Missile.State.EXPLODE;
 	}
 		
 	lastCall = System.nanoTime();

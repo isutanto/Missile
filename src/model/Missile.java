@@ -7,27 +7,6 @@ import java.lang.annotation.Target;
 import java.util.*;
 import javax.imageio.ImageIO;
 
-/*
-public class Missile extends MovingEntity {
-	
-	public static final int BLAST_RADIUS = 30;
-	private SteeringBehaviors steering;
-	public Vector2D gForce;
-	
-	public enum State {
-		ACCEL, FREEFALL, GROUND, EXPLODE
-	}
-	public State state;
-	
-	public enum Guidance{
-		PROPOTIONAL, PURSUIT, PARALLEL, NONE
-	}
-	public Guidance guide;
-	
-	//Set to true if the mouse was clicked within the missile
-	public boolean isPressed;*/
-	
-	//time for engine to burnout
 
 
 
@@ -117,6 +96,8 @@ public class Missile extends MovingEntity {
 	//add max angle turn speed
 	
 	boolean calledOnce;
+	
+	
 // Addition to self destruct 
 	public int engage = 0;
 	public int engageDist = 200;  // half of detectionDist in Aircraft
@@ -150,6 +131,8 @@ public class Missile extends MovingEntity {
 		//guide = Guidance.PURSUIT;
 		//guide = Guidance.PARALLEL;
 		
+		//System.out.println("Missile velocity initialized : " + velocity);
+		
 		guide = Guidance.NONE;
 		calledOnce = false;
 		
@@ -157,17 +140,21 @@ public class Missile extends MovingEntity {
 
 	}
 	
-
+/*
 	public void update(MovingEntity target, double delta) {
 		totalTime += delta;
 		timeSeconds = totalTime/1000000000L;
 		
+
 		//calculate forces
 		calculateThrust();
 		calculateLift();
 		calculateDrag();
 		calculateWeight(totalTime);
         //add up, calculate acceleration/position
+		
+		//update array
+		speedArray.add(velocity.length());
 		
 		if(state == State.ACCEL || state == State.MISSED){
 			thrustForce = (int) thrust.x;
@@ -183,13 +170,16 @@ public class Missile extends MovingEntity {
 		    force = force.add(accel4);
 		    Vector2D accel = force.div(mass);
 			//add vector /mass * delta t
-			
+		    
+		    
 			//add accelerations to velocity -- (multiply by delta t -- )
 			velocity = velocity.add(accel.mul(delta));
 			
-			System.out.println("Missile velocity " + velocity);
+			
+			//System.out.println("Missile velocity " + velocity);
 			velocity.truncate(this.maxSpeed);
-			System.out.println("Missile velocity after being truncate " + velocity);
+			
+
 		}else{
 			thrustForce = 0;
 			dragForce = 0;
@@ -215,14 +205,14 @@ public class Missile extends MovingEntity {
 		{    
 			heading = new Vector2D(velocity);
 			heading.normalize();
-			
+		
 			side = heading.perp();
 			speedArray.add(velocity.length());
 		}
-		
-}
+	}*/		
+
 	
-/*	
+
 	public void update(MovingEntity target, double delta) {
 		totalTime += delta;
 		timeSeconds = totalTime/1000000000L;
@@ -286,7 +276,7 @@ public class Missile extends MovingEntity {
 			
 			speedArray.add(velocity.length());
 		}
-}*/
+}
 
 	
 	private void updatePosition() {

@@ -425,7 +425,7 @@ private void gameRender()//(int x, int y)
 	 
 
 	 //If missile explodes, stop drawing aircraft
-	 if((((GameWorldModel)getModel()).getMissile().state != State.EXPLODE) || (((GameWorldModel)getModel()).getMissile().state != State.SELFDESTRUCT))	 
+	 if((((GameWorldModel)getModel()).getMissile().state != State.EXPLODE) && (((GameWorldModel)getModel()).getMissile().state != State.SELFDESTRUCT))	 
 	 drawImage(dbg, aircraftImage, aircraftPosx, aircraftPosy);
 	  
   dbg.setFont(new Font(Font.DIALOG, Font.BOLD, 15));
