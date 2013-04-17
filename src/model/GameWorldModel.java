@@ -59,8 +59,8 @@ public class GameWorldModel extends AbstractModel {
 			   MAP[i][j] = 2 + randomGenerator.nextInt(4);
 		}
 	
-	        aircraft = new Aircraft(new Vector2D (400, -1100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 100, new Vector2D (0, 0), 5000, 
+	        aircraft = new Aircraft(new Vector2D (4000, -10000), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
+			missile = new Missile(new Vector2D (200, 400), 50, new Vector2D(0, 0), 100, new Vector2D (0, 0), 5000, 
 					new Vector2D(0, 0), 1, 2, aircraft);
 			
 			aircraft.getSteering().setTarget(missile); 
@@ -135,7 +135,9 @@ public Image getMap(int i,int j) {
 	{
 		resizeMap();
 	}
-	int imageNumber = MAP[i][j];
+	int imageNumber = 0;
+	if(i > 0 && j > 0)
+	   imageNumber = MAP[i][j];
 	
 	
 	switch (imageNumber) {

@@ -25,7 +25,7 @@ public class Missile extends MovingEntity {
 	public State state;
 	
 	public enum Guidance{
-		PROPOTIONAL, PURSUIT, PARALLEL, NONE
+		PROPORTIONAL, PURSUIT, PARALLEL, NONE
 	}
 	public Guidance guide;
 	
@@ -206,7 +206,7 @@ public class Missile extends MovingEntity {
 
 	private void getDesiredAngle() {
 		
-		if (guide == Guidance.PROPOTIONAL && timeSeconds > COOLDOWN && state != State.GROUND)
+		if (guide == Guidance.PROPORTIONAL && timeSeconds > COOLDOWN && state != State.GROUND)
 			desiredAngle = steering.proportional();
 		else if(guide == Guidance.PURSUIT && timeSeconds > COOLDOWN && state != State.GROUND)
 			desiredAngle = steering.pursuit(steering.getMyTarget());	
@@ -341,7 +341,7 @@ public class Missile extends MovingEntity {
 		else if(option == "parallel")
 			guide = Guidance.PARALLEL;
 		else if (option == "proportional")
-			guide = Guidance.PROPOTIONAL;
+			guide = Guidance.PROPORTIONAL;
 		
 	}
 
@@ -351,6 +351,10 @@ public class Missile extends MovingEntity {
 	public ArrayList<Double> getSpeedArray()
 	{
 		return speedArray;
+	}
+	public double getSpeed()
+	{
+       return velocity.length();
 	}
 
 }
