@@ -25,6 +25,15 @@ public class Aircraft extends MovingEntity {
 	public int odd = 0;
 	public int finish = 0;
 	
+	// Angle for loop
+	
+	public double airCurAngle;	
+	public double airDesiredAngle;
+	public double TURNRATE = 10;
+	//public double angle;
+	
+	
+	
 	public int detectionDist = 300;
 	public Vector2D gForce;
 	
@@ -180,7 +189,7 @@ public class Aircraft extends MovingEntity {
 			if (position.y > 360)
 				position.y = 360;
 		}
-		else
+		else if (choice == 1)
 		{
 			if (finish == 0){
 			Random rand;
@@ -191,7 +200,7 @@ public class Aircraft extends MovingEntity {
 			
 			if(randomSelct <=1)
 			{
-				Swerve();
+				Wave();
 				N++;
 				if( N == 50)
 					finish = 0;
@@ -202,13 +211,16 @@ public class Aircraft extends MovingEntity {
 				position.y = position.y + velocity.y * Missile.timeSeconds;
 				if (position.y > 360)
 					position.y = 360;
-			}
+			}//*/
 			/*else
 			{
-				// loopy do dah
+				Loop();
 			}*/
 
-		}
+		}/*else
+		{
+
+		}*/
 	}
 
 	@Override
@@ -217,7 +229,39 @@ public class Aircraft extends MovingEntity {
 		
 	}
 	
-	public void Swerve()
+	private void adjustCurAngle(){
+		 if((int) airDesiredAngle < airCurAngle)
+			airCurAngle += TURNRATE;
+		else if((int)airDesiredAngle > airCurAngle)
+			airCurAngle -= TURNRATE;
+		 
+		// System.out.println("Current Angle is " + airCurAngle);
+	}
+	
+	public double getAngle() { 
+	    double angle = (double) Math.toDegrees(Math.atan2(this.position.x, this.position.y)); 
+	    
+	    System.out.println("Current Angle is " + angle);
+	    
+	    if(angle < 0)
+	        angle += 360; 
+	   
+	    return angle - 90; 	
+	}
+	
+	public void Loop()
+	{
+		airCurAngle = getAngle();
+		airDesiredAngle = 180;
+		adjustCurAngle();
+		//velocity = 
+		position.x = position.x + (velocity.x * Math.cos(Math.toRadians(airCurAngle)) * Missile.timeSeconds);
+		position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(airCurAngle));
+		
+		
+	}
+	
+	public void Wave()
 	{
 		// Randomize the evasion technique
 					if (N == 30)

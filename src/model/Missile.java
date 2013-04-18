@@ -212,7 +212,7 @@ public class Missile extends MovingEntity {
 	}*/		
 
 	
-
+//*
 	public void update(MovingEntity target, double delta) {
 		totalTime += delta;
 		timeSeconds = totalTime/1000000000L;
@@ -276,7 +276,7 @@ public class Missile extends MovingEntity {
 			
 			speedArray.add(velocity.length());
 		}
-}
+}//*/
 
 	
 	private void updatePosition() {

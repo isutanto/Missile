@@ -62,7 +62,7 @@ public class GameWorldModel extends AbstractModel {
 			   MAP[i][j] = 2 + randomGenerator.nextInt(4);
 		}
 	
-
+			//nice swerve when va = 5.5  Vm = 5.6
 			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
 	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(3, 0), 5.5, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 5.0);
 			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 5.6, new Vector2D (0, 0), 5000, 
