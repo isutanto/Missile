@@ -154,18 +154,16 @@ public class SteeringBehaviors {
 		}
 	
 		Vector2D desiredVelocity = (aircraft_entity.pos()).sub(target);
-		//System.out.println("Desired velocity for the Aircraft = " + desiredVelocity);
 		desiredVelocity.normalize();
 		desiredVelocity = desiredVelocity.mul(aircraft_entity.maxForce());
-		//System.out.println("Desired velocity after multiplied to the Aircraft Max Force = " + desiredVelocity);
-		//System.out.println("Current aircraft velocity = " + aircraft_entity.velocity());
+		
 		return (desiredVelocity.sub(aircraft_entity.velocity()));	
 	}
 	
 	public Vector2D evade(Missile pursuer){
 		System.out.println("in evade");
 		Vector2D toPursuer = (pursuer.pos()).sub(aircraft_entity.pos());
-		//System.out.println("Value toPursuer = " + toPursuer);
+		
 		double lookAheadTime = toPursuer.length() / (aircraft_entity.maxForce() + pursuer.speed());
 		return flee(pursuer.pos().add(pursuer.velocity().mul(lookAheadTime)));
 	}

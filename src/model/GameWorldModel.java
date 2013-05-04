@@ -62,11 +62,13 @@ public class GameWorldModel extends AbstractModel {
 			   MAP[i][j] = 2 + randomGenerator.nextInt(4);
 		}
 	
-			//nice swerve when va = 5.5  Vm = 5.6
-			//aircraft = new Aircraft(new Vector2D (500, 100), 5, new Vector2D(5.2, 0), 400, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 2.0);
-	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(3, 0), 5.5, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 5.0);
+
+			//nice Wave when airplane max speed close to the missile (va = 5.5  Vm = 5.6)
+
+	        aircraft = new Aircraft(new Vector2D (400, -200), 5, new Vector2D(3, 0), 5.4, new Vector2D (900, 100), 300, new Vector2D(5,5), 1, 5.0);
 			missile = new Missile(new Vector2D (200, 400), 5, new Vector2D(0, 0), 5.6, new Vector2D (0, 0), 5000, 
 					new Vector2D(5, 5), 1.0, 5.0, aircraft);
+
 			
 			aircraft.getSteering().setTarget(missile); 
 			
@@ -131,16 +133,15 @@ public Aircraft getAircraft(){
 	return aircraft;
 }
 
-/*public Image getMap() {
-	return background;
-}*/
 
 public Image getMap(int i,int j) {
 	if(i >= MAPX || j >= MAPY)
 	{
 		resizeMap();
 	}
-	int imageNumber = MAP[i][j];
+	int imageNumber = 0;
+	if(i > 0 && j > 0)
+	   imageNumber = MAP[i][j];
 	
 	
 	switch (imageNumber) {
@@ -227,8 +228,6 @@ public void update() {
 	missile.update(aircraft, System.nanoTime() - lastCall);
 	aircraft.update(missile, System.nanoTime() - lastCall);
 	
-	/*if(aircraft.position.x > GameView.PWIDTH)
-		aircraft.position.x = 0;*/
 	if(missile.position.y >= GROUND.y){
 		missile.position.setValue(new Vector2D(missile.position.x, GROUND.y));
 		missile.velocity.setValue(new Vector2D(0, 0));
@@ -246,21 +245,16 @@ public void update() {
 	
 	if(missile.getMissileState() == State.SELFDESTRUCT)
 	{
-		//System.out.println("Missile state is " + missile.getMissileState());
 		missile.image = kaboom;
 	}
 		
 	lastCall = System.nanoTime();
 	
 }
-//<<<<<<< HEAD
-//=======
+
 public BufferedImage boom(){return kaboom;}
-//>>>>>>> c9ac1d9c9f12447327c642ed59d43e78b8b36d76
 public int getMapX(){ return MAPX;}
 public int getMapY(){ return MAPY;}
 }
 
-
-//}
 

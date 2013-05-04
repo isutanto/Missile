@@ -11,12 +11,15 @@ import model.Vector2D;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
@@ -28,6 +31,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JScrollPane;  
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -36,6 +40,7 @@ import javax.swing.JPanel;
 import java.io.*;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 
 import org.jfree.chart.ChartFactory;
@@ -44,17 +49,23 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+//<<<<<<< HEAD
+
+//=======
+import org.jfree.data.time.*;
 
 
 
 
 @SuppressWarnings("serial")
-public class GameView extends JFrameView implements Runnable, MouseListener{
+public class GameView extends JFrameView implements Runnable, MouseListener, ActionListener{
 
 	  public static final int PWIDTH = 1000;   // size of panel
 	  public static final int PHEIGHT = 500; 
@@ -122,29 +133,209 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 	  boolean drawMe = false;
 
 	  
+	  private TimeSeries xpseries;
+	  private TimeSeries ypseries;
+	  //private TimeSeries xyseries;
+	  private TimeSeries spseries;
+      
+	   
+	  private int lastxValue;
+	  private int lastyValue;
+	  //private int lastxyValue;
+	  private double lastspValue;
+	  
+	  private JFrame x;
+	  private JFrame y;
+	  private JFrame s;
+	  
+	  JButton xButton;
+	  JButton yButton;
+	  JButton sButton;
+	  
+	  public void actionPerformed(ActionEvent e)
+	  {
+		  String choice = e.getActionCommand();
+		  if(choice.equals("X"))
+		  {
+			  if(x.isVisible())
+			     x.setVisible(false);
+			  else
+				 x.setVisible(true);
+		  }
+		  else if(choice.equals("Y"))
+		  {
+			  if(y.isVisible())
+			     y.setVisible(false);
+			  else
+				 y.setVisible(true);
+		  }
+		  else if(choice.equals("S"))
+		  {
+			  if(s.isVisible())
+			     s.setVisible(false);
+			  else
+				 s.setVisible(true);
+		  }
+	  }
+	  public void createXPosChart()
+	  {
+		    this.xpseries = new TimeSeries("Random Data");
+	        final TimeSeriesCollection dataset = new TimeSeriesCollection(this.xpseries);
+	        final JFreeChart chart = createChart(dataset, "X Position");
+
+	        final ChartPanel chartPanel = new ChartPanel(chart);
+
+	        x = new JFrame();
+			x.setLayout(new BorderLayout());
+			x.setBounds(1100, 500, 200, 200);
+			x.setVisible(true);
+
+			JPanel jPanel = new JPanel();
+			jPanel.setLayout(new java.awt.BorderLayout());
+			 
+			jPanel.add(chartPanel,BorderLayout.CENTER);
+			jPanel.validate();
+			x.add(jPanel, BorderLayout.CENTER);
+			x.pack();
+			x.setVisible(false);
+	  }
+	  public void createYPosChart()
+	  {
+		    this.ypseries = new TimeSeries("Random Data");
+	        final TimeSeriesCollection dataset = new TimeSeriesCollection(this.ypseries);
+	        final JFreeChart chart = createChart(dataset, "Y Position");
+
+	        final ChartPanel chartPanel = new ChartPanel(chart);
+
+	        y = new JFrame();
+			y.setLayout(new BorderLayout());
+			y.setBounds(1100, 0, 200, 200);
+			y.setVisible(true);
+
+			JPanel jPanel = new JPanel();
+			jPanel.setLayout(new java.awt.BorderLayout());
+			 
+			jPanel.add(chartPanel,BorderLayout.CENTER);
+			jPanel.validate();
+			y.add(jPanel, BorderLayout.CENTER);
+			y.pack();
+			y.setVisible(false);
+	  }
+	  public void createSPChart()
+	  {
+		    this.spseries = new TimeSeries("Random Data");
+	        final TimeSeriesCollection dataset = new TimeSeriesCollection(this.spseries);
+	        final JFreeChart chart = createChart(dataset, "Speed");
+
+	        final ChartPanel chartPanel = new ChartPanel(chart);
+
+	        s = new JFrame();
+			s.setLayout(new BorderLayout());
+			s.setBounds(300, 600, 100, 100);
+			s.setVisible(true);
+
+			JPanel jPanel = new JPanel();
+			jPanel.setLayout(new java.awt.BorderLayout());
+			 
+			jPanel.add(chartPanel,BorderLayout.CENTER);
+			jPanel.validate();
+			s.add(jPanel, BorderLayout.CENTER);
+			s.pack();
+			s.setVisible(false);
+	  }
+	  private JFreeChart createChart(final XYDataset dataset, String name) {
+		  
+	        final JFreeChart result = ChartFactory.createTimeSeriesChart(
+	            (name + " Chart"), 
+	            "Time", 
+	            name,
+	            dataset, 
+	            true, 
+	            true, 
+	            false
+	        );
+
+	        return result;
+	        
+	    }
+	    
+	  public void updateXPosChart()
+	  {
+          this.lastxValue = -200 + (int)((GameWorldModel)getModel()).getMissile().getPosition().x;
+          final Millisecond now = new Millisecond();
+          //System.out.println("Now = " + now.toString());
+          this.xpseries.addOrUpdate(new Millisecond(), this.lastxValue);
+      }
+	  public void updateYPosChart()
+	  {
+          this.lastyValue = 400 - (int)((GameWorldModel)getModel()).getMissile().getPosition().y;
+          final Millisecond now = new Millisecond();
+          //System.out.println("Now = " + now.toString());
+          this.ypseries.addOrUpdate(new Millisecond(), this.lastyValue);
+      }
+	  public void updatespChart()
+	  {
+		  double speed = ((GameWorldModel)getModel()).getMissile().getSpeed();
+          this.lastspValue = speed;
+          final Millisecond now = new Millisecond();
+          //System.out.println("Now = " + now.toString());
+          this.spseries.addOrUpdate(new Millisecond(), this.lastspValue);
+      }
+	    
+
 	  public GameView(GameWorldModel model, GameController controller)
 	  {
-		super(model, controller); 
+		super(model, controller);
+		
+		createXPosChart();
+		createYPosChart();
+		createSPChart();
+		
 		timeArray = new ArrayList<Double>(10);
 		
 		testPanel = new JPanel();
-		getContentPane().add(testPanel);
+		JPanel buttonPanel = new JPanel();
 		
-		/*testPanel.getInputMap().put(KeyStroke.getKeyStroke("F2"),
-	              "doSomething");
-		*/
+		JPanel container = new JPanel();
+		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		
+		xButton = new JButton("Toggle X Chart");
+		yButton = new JButton("Toggle Y Chart");
+		sButton = new JButton("Toggle Speed Chart");
+		  
+		  xButton.setActionCommand("X");
+		  yButton.setActionCommand("Y");
+		  sButton.setActionCommand("S");
+		  
+		  buttonPanel.add(xButton);
+		  buttonPanel.add(yButton);
+		  buttonPanel.add(sButton);
+		  
+		  xButton.addActionListener(this);
+		  yButton.addActionListener(this);
+		  sButton.addActionListener(this);
+		  
+		  xButton.setVisible(true);
+		  yButton.setVisible(true);
+		  sButton.setVisible(true);
+		  
+		  xButton.setPreferredSize(new Dimension(250, 45));
+		  yButton.setPreferredSize(new Dimension(250, 45));
+		  sButton.setPreferredSize(new Dimension(250, 45));
+		  
+		buttonPanel.setPreferredSize( new Dimension(PWIDTH, 75));
+	
 		testPanel.setPreferredSize( new Dimension(PWIDTH, PHEIGHT));
 		testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.LINE_AXIS));
-
-		//testPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); 
-		
 
 	    setFocusable(true);
 	    requestFocus(); 
 	    
 	    addMouseListener(this);
+	  
+	    getContentPane().add(testPanel, BorderLayout.NORTH);
+	    getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	    
-	    getContentPane().add(testPanel, BorderLayout.SOUTH);
 	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    setTitle("Missile Launcher!!");
 	 
@@ -155,16 +346,16 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 		} catch (IOException e) {
 			System.out.println("Can't find button images");
 		}
-		
-	    pack();
-	    setResizable(false);  
-	    setVisible(true);
+		testPanel.setVisible(true);
+	    buttonPanel.setVisible(true);
 	    
-	    //this.requestFocusInWindow(); 
+	    pack();
+	    setResizable(true);  
+	    setVisible(true);
 
 	  }
 
-
+      
 
 	  public void run()
 	  /* The frames of the animation are drawn inside the while loop. */
@@ -201,12 +392,7 @@ public class GameView extends JFrameView implements Runnable, MouseListener{
 			xdif = curposx - prevposx;
 			ydif = curposy - prevposy;
 			
-/*<<<<<<< HEAD
-			camx += xdif;
-			camy -= ydif;
-			
-			gameRender(xdif, ydif);
-=======*/
+
 			//Moves camera based on change in missle coordinates
 			camx += xdif;
 			camy -= ydif;
@@ -282,13 +468,14 @@ private void paintScreen(){
   { System.out.println("Graphics context error: " + e);  }
 }
 
-private void gameRender()//(int x, int y)
+private void gameRender()
 {
 
 	
 	double x = (double) ((GameWorldModel)getModel()).getMissile().timeSeconds;
 	timeArray.add(x);
 	
+
 	if(!askForDump && (((GameWorldModel)getModel()).getMissile().state == State.EXPLODE || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT))
 	{
 		System.out.println("Click for chart creation.");
@@ -306,12 +493,6 @@ private void gameRender()//(int x, int y)
     	dbg = dbImage.getGraphics();
 
   }
-	//draw background
-	//dbg.drawImage(((GameWorldModel)getModel()).getMap(), 10, 10, null);
-	//dbg.clearRect(0, 0, PWIDTH, PHEIGHT);
-	
-	
-
 	
 	BufferedImage missileImage = ((GameWorldModel)getModel()).getMissile().image;
 	BufferedImage aircraftImage = ((GameWorldModel)getModel()).getAircraft().image;
@@ -327,62 +508,19 @@ private void gameRender()//(int x, int y)
 
 	
 	//Draw background image
-	for(int i = -1; i < 12; i++)
+	for(int i = -1; i < 15; i++)
 	   for(int j = 0; j < 7; j++)
 	      dbg.drawImage(((GameWorldModel)getModel()).getMap(i + left, j + bottom), -remx + (i * 100), 455 + remy - (j * 100) , null);
 
 	//creating the AffineTransform instance 
 	AffineTransform affineTransform = new AffineTransform();
 	
-	//set the translation to the mid of the component 
-	//affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
-		//((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2); 
-//<<<<<<< HEAD
-	
-	
-   //affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
-		//((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
-	
-	/*if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
-		affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
-				((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
-	
-	 */
-
 	 affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
 			PHEIGHT / 2 - missileImage.getHeight()/2);
 
-	/* affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
-			PHEIGHT / 2 - missileImage.getHeight());
 
 	
-	//rotate with the anchor point as the mid of the image 
-		
-	 affineTransform.rotate(Math.toRadians(-((GameWorldModel)getModel()).getMissile().curAngle),  missileImage.getWidth()/2, missileImage.getHeight()/2); 
-	//draw the image using the AffineTransform 
-
-
-	Graphics2D g2d = (Graphics2D)dbg;
-
-==========
->>>>>>> c9ac1d9c9f12447327c642ed59d43e78b8b36d76*/
-	
-	//g2d.drawImage(missileImage, affineTransform, this); 
-	
-//<<<<<<< HEAD
-	
-	//Not sure what this draws.
-	
-//=======
-     //affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
-	   //((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
-	
-	 /*if(((GameWorldModel)getModel()).getMissile().state == State.EXPLODE)
-		affineTransform.setToTranslation(((GameWorldModel)getModel()).getMissile().pos().x - missileImage.getWidth()/2,
-				((GameWorldModel)getModel()).getMissile().pos().y - missileImage.getHeight()/2);
-	
-	 */
-	 //Places misisle in the center of the window as it is the focus of the camera
+	 //Places missile in the center of the window as it is the focus of the camera
 	 affineTransform.setToTranslation(PWIDTH / 2 - missileImage.getWidth()/2,
 			PHEIGHT / 2 - missileImage.getHeight());
 	
@@ -391,18 +529,6 @@ private void gameRender()//(int x, int y)
 	 
 	 Graphics2D g2d = (Graphics2D)dbg;
 	
-	//Not sure what this draws.
-//>>>>>>> c9ac1d9c9f12447327c642ed59d43e78b8b36d76
-	/* dbg.setColor(Color.YELLOW);
-	  
-	  dbg.drawLine((int)
-			 	((GameWorldModel)getModel()).getMissile().getPosition().x , 
-		 		(int) ((GameWorldModel)getModel()).getMissile().getPosition().y,
-		 		(int) ((GameWorldModel)getModel()).getMissile().getPosition().x, 
-		 		(int) ((GameWorldModel)getModel()).getMissile().getPosition().y);
-<<<<<<< HEAD
-		 		*/
-
 	  
 	 int missilePosx = (int) ((GameWorldModel)getModel()).getMissile().getPosition().x - missileImage.getWidth()/2;
 	 int missilePosy = (int) ((GameWorldModel)getModel()).getMissile().getPosition().y - missileImage.getHeight()/2;
@@ -454,35 +580,41 @@ private void gameRender()//(int x, int y)
   dbg.drawString("FPS: " + lastFps, 900, 490);
   
   //draw missile's state
-  dbg.drawString("Missile state: " + ((GameWorldModel)getModel()).getMissile().state, 700, 35);
-  dbg.drawString("Missile guide: " + ((GameWorldModel)getModel()).getMissile().guide, 700, 50);
-  dbg.drawString("Distance to target: " + (int) ((GameWorldModel)getModel()).getMissile().distanceToTarget(), 700, 65);
-  dbg.drawString("Current Angle: " + ((GameWorldModel)getModel()).getMissile().curAngle, 700, 80);
-  dbg.drawString("Desired Angle: " +  (int) ((GameWorldModel)getModel()).getMissile().desiredAngle, 700, 95);
-  dbg.drawString("Missile velocity: " + (int) ((GameWorldModel)getModel()).getMissile().velocity().x + ", " + (int) -((GameWorldModel)getModel()).getMissile().velocity().y, 700, 110);
-  dbg.drawString("Aircraft velocity: " + (int) ((GameWorldModel)getModel()).getAircraft().velocity().x+ ", " + (int) -((GameWorldModel)getModel()).getAircraft().velocity().y, 700, 125);
+  dbg.drawString("Missile state: " + ((GameWorldModel)getModel()).getMissile().state, 700, 55);
+  dbg.drawString("Missile guide: " + ((GameWorldModel)getModel()).getMissile().guide, 700, 70);
+  dbg.drawString("Distance to target: " + (int) ((GameWorldModel)getModel()).getMissile().distanceToTarget(), 700, 85);
+  dbg.drawString("Current Angle: " + ((GameWorldModel)getModel()).getMissile().curAngle, 700, 100);
+  dbg.drawString("Desired Angle: " +  (int) ((GameWorldModel)getModel()).getMissile().desiredAngle, 700, 115);
+  dbg.drawString("Missile velocity: " + (int) ((GameWorldModel)getModel()).getMissile().velocity().x + ", " + (int) -((GameWorldModel)getModel()).getMissile().velocity().y, 700, 130);
+  dbg.drawString("Aircraft velocity: " + (int) ((GameWorldModel)getModel()).getAircraft().velocity().x+ ", " + (int) -((GameWorldModel)getModel()).getAircraft().velocity().y, 700, 145);
   
+
   
   //Force values
-  dbg.drawString("Time: " + (int) ((GameWorldModel)getModel()).getMissile().timeSeconds, 700, 345);
-  dbg.drawString("Thrust: " + ((GameWorldModel)getModel()).getMissile().thrustForce, 700, 360);
-  dbg.drawString("Lift: " + ((GameWorldModel)getModel()).getMissile().liftForce, 700, 375);
-  dbg.drawString("Drag: " + ((GameWorldModel)getModel()).getMissile().dragForce, 700, 390);
-  dbg.drawString("Weight: " + ((GameWorldModel)getModel()).getMissile().weight, 700, 405);
-  dbg.drawString("Map Area: " + "(" + left + ", " + bottom + ", " + (left + 12) + ", " + (bottom + 7) + ")", 700, 420);
+  dbg.drawString("Time: " + (int) ((GameWorldModel)getModel()).getMissile().timeSeconds, 700, 325);
+  dbg.drawString("Thrust: " + ((GameWorldModel)getModel()).getMissile().thrustForce, 700, 340);
+  dbg.drawString("Lift: " + ((GameWorldModel)getModel()).getMissile().liftForce, 700, 355);
+  dbg.drawString("Drag: " + ((GameWorldModel)getModel()).getMissile().dragForce, 700, 370);
+  dbg.drawString("Weight: " + ((GameWorldModel)getModel()).getMissile().weight, 700, 385);
+  dbg.drawString("Map Area: " + "(" + left + ", " + bottom + ", " + (left + 12) + ", " + (bottom + 7) + ")", 700, 400);
  // dbg.drawString("G-Force: " + (int) ((GameWorldModel)getModel()).getMissile().gForce.y, 900, 460);
 
   
+  if(!((((GameWorldModel)getModel()).getMissile().state == State.EXPLODE) || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT ))
+  {
+	 if(!isPaused)
+	 {
+        updateXPosChart();
+        updateYPosChart();
+        updatespChart();
+	 }
+  }   
   if(((((GameWorldModel)getModel()).getMissile().state == State.EXPLODE) || ((GameWorldModel)getModel()).getMissile().state == State.SELFDESTRUCT )&& chartsCreated == false)
 	{
 	    if(!drawMe) 
 		   drawMe = true;
-	    else
+	    else //Static charts (no longer needed)
 	    {
-	    	createXPositionChart();
-			createYPositionChart();
-			createPositionChart();
-			createSpeedChart(((GameWorldModel)getModel()).getMissile().getSpeedArray());
 			chartsCreated = true;
 	    }
 
@@ -639,6 +771,7 @@ public void dragView()
 		System.out.println("Creation complete.");
 	}
 
+
 	public XYSeries updateDataSet(XYSeries s, double x, double y)
 	{
 		s.addOrUpdate(x,y);
@@ -705,7 +838,7 @@ public void dragView()
 	
 	}
 	
-	
+	// Function to Dump Image
 	public void dumpImage()
 	{/*
 		System.out.println("Dumping map image...");
@@ -745,10 +878,7 @@ public void dragView()
          System.out.println("Dump complete. Image located under vpproject folder.");
          System.out.println("Drag mouse to move map.");*/
 	}
-/*<<<<<<< HEAD
-	
-}
-=======*/
+
 	public void createPositionChart()
 	{
 		JFreeChart chart = null;

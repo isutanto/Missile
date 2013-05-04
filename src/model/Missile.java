@@ -30,7 +30,7 @@ public class Missile extends MovingEntity {
 	public State state;
 	
 	public enum Guidance{
-		PROPOTIONAL, PURSUIT, PARALLEL, NONE
+		PROPORTIONAL, PURSUIT, PARALLEL, NONE
 	}
 	public Guidance guide;
 	
@@ -39,6 +39,7 @@ public class Missile extends MovingEntity {
 	
 	//time for engine to burnout
 	public static final long BURNOUT = 50;
+
 	
 	//total time elapsed in nanoseconds
 	public double totalTime;
@@ -64,7 +65,7 @@ public class Missile extends MovingEntity {
 	public ArrayList<Double> speedArray;
 	
 	private static final double MISSED_SPEEDUP = 2.0;
-//	private static final double MISSED_ANGLE = -255.0;
+
 	
 	//Equation constants
 	//Lift force
@@ -88,7 +89,7 @@ public class Missile extends MovingEntity {
 	public double weight;
 	
 	public double curAngle=90;	
-	public double desiredAngle;
+	public static double desiredAngle;
 	
 	private int positionTimeCount = 0;	
 	
@@ -101,7 +102,7 @@ public class Missile extends MovingEntity {
 // Addition to self destruct 
 	public int engage = 0;
 	public int engageDist = 200;  // half of detectionDist in Aircraft
-	public int missDist = 1500;
+	public int missDist = 1500;   // distance where the missile will self destruct
 	
 	
 	public Missile(Vector2D position,
@@ -339,7 +340,7 @@ public class Missile extends MovingEntity {
 
 	private void getDesiredAngle() {
 		
-		if (guide == Guidance.PROPOTIONAL && timeSeconds > COOLDOWN && state != State.GROUND)
+		if (guide == Guidance.PROPORTIONAL && timeSeconds > COOLDOWN && state != State.GROUND)
 			desiredAngle = steering.proportional();
 		else if(guide == Guidance.PURSUIT && timeSeconds > COOLDOWN && state != State.GROUND)
 			desiredAngle = steering.pursuit(steering.getMyTarget());	
@@ -377,31 +378,6 @@ public class Missile extends MovingEntity {
 	
 	
 //Modify Weight Calculation:
-/*	private void calculateWeight() {
-		double percent;
-		if(position.y < 0)
-			percent = .90;
-		else if(position.y < 50)
-			percent = .91;
-		else if(position.y < 100)
-			percent = .92;
-		else if (position.y < 150)
-			percent = .93;
-		else if (position.y < 200)
-			percent = .94;
-		else if (position.y < 250)
-			percent = .95;
-		else if (position.y < 300)
-			percent = .96;
-		else if (position.y < 350)
-			percent = .97;
-		else if (position.y < 400)
-			percent = .98;
-		else 
-			percent = 1.0;
-		weight = (int) (G0*percent);
-		
-	}*/
 
 	private void calculateWeight(double dTime){
 		if(weight == 0){
@@ -419,22 +395,21 @@ public class Missile extends MovingEntity {
 		else if(option == "parallel")
 			guide = Guidance.PARALLEL;
 		else if (option == "proportional")
-			guide = Guidance.PROPOTIONAL;
+			guide = Guidance.PROPORTIONAL;
 		
 	}	
 	
 	
 	private void updateState(double timeSeconds) {
 		if(timeSeconds < BURNOUT && state != State.MISSED){// && state!= State.SELFDESTRUCT){
-			//System.out.println("State is != MISSED");
-//			state = State.ACCEL;
-			//System.out.println("State: "+state);
+
 		}
 		else if (state != State.EXPLODE && state!=State.MISSED) 
 			state = State.FREEFALL;
 		
 		
-		//Self Destruct the missile 
+		//Self Destruct the missile when the missile has engaged the aircraft at distance < 100 
+		// and lost the aircraft; distance = 1500
 		if ((this.distanceToTarget()>= missDist) && (engage > 0) && ((BURNOUT-timeSeconds)>10)){
 			System.out.println("Self destruct initiated..!! 3.. 2.. 1....");
 			state = State.SELFDESTRUCT;
@@ -552,4 +527,10 @@ public class Missile extends MovingEntity {
 		return speedArray;
 	}
 	
+
+	public double getSpeed()
+	{
+       return velocity.length();
+	}
+
 }

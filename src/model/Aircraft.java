@@ -25,23 +25,18 @@ public class Aircraft extends MovingEntity {
 	public int odd = 0;
 	public int finish = 0;
 	
-	// Angle for loop
-	
-	public double airCurAngle;	
+	// Angle for loop	
+	/*public double airCurAngle;
+	public double angle;
+	public int angleGet = 0;
 	public double airDesiredAngle;
-	public double TURNRATE = 10;
-	//public double angle;
+	public double TURNRATE = 10;*/
 	
 	
 	
 	public int detectionDist = 300;
 	public Vector2D gForce;
 	
-	// Angle of maneuver for aircraft add on
-	/*
-	public double curAngle=0;	
-	public double desiredAngle;
-	*/
 	
 	
 	public Aircraft(Vector2D position,
@@ -92,12 +87,6 @@ public class Aircraft extends MovingEntity {
 	public void update(Missile missile, double delta) {
 				
 		double distance = this.position.distance(missile.pos());
-		/*System.out.println("Distance to Missile : " + distance);
-		
-		System.out.println("Missile position X: " + missile.pos().x);
-		System.out.println("Missle position y: " + missile.pos().y);
-		System.out.println("This position X: " + this.position.x);
-		System.out.println("This position y: " + this.position.y);*/
 				
 		if(this.position.distance(missile.pos()) < detectionDist && (missile.getMissileState() != State.EXPLODE || missile.getMissileState() != State.SELFDESTRUCT))//800)
 		{
@@ -108,22 +97,14 @@ public class Aircraft extends MovingEntity {
 			Vector2D curVelocity = velocity;
 			
 			double speed = curVelocity.length();
-			System.out.println("Current speed " + velocity);
 			double desiredSpeed = evadeVelocity.length();
-			System.out.println("Desired speed " + evadeVelocity);
 		
 			Vector2D acc = (evadeVelocity.sub(velocity)).div(System.nanoTime() - GameWorldModel.lastCall);
-			System.out.println("Desired acc " + acc);
-			System.out.println("Desired acc scalar " + acc.length());
-			//double acc = (desiredSpeed - speed)/();
-			//System.out.println("Acc needed " + acc * 10000000);
 
 			
 			if (!evadeVelocity.isZero())
 				velocity = velocity.add(evadeVelocity);
 			
-			
-			//System.out.println("Velocity in Aircraft " + velocity);
 			velocity.truncate(maxSpeed);
 			
 			updateAircraftPos(1);	
@@ -179,9 +160,9 @@ public class Aircraft extends MovingEntity {
 		position.x = MouseInfo.getPointerInfo().getLocation().x;
 		position.y = MouseInfo.getPointerInfo().getLocation().y;
 	}
-		
-	private void updateAircraftPos(int choice) {
-		
+
+	// Aircraft maneuvering option after missile has been detected
+	private void updateAircraftPos(int choice) {		
 
 		if (choice == 0){
 			position.x = position.x + velocity.x* Missile.timeSeconds;
@@ -205,22 +186,16 @@ public class Aircraft extends MovingEntity {
 				if( N == 50)
 					finish = 0;
 			}
-			else //if ((1 < randomSelct) && (randomSelct <= 2) )
+			else 
 			{
 				position.x = position.x + velocity.x* Missile.timeSeconds;
 				position.y = position.y + velocity.y * Missile.timeSeconds;
 				if (position.y > 360)
 					position.y = 360;
-			}//*/
-			/*else
-			{
-				Loop();
-			}*/
+			}
 
-		}/*else
-		{
+		}
 
-		}*/
 	}
 
 	@Override
@@ -229,42 +204,48 @@ public class Aircraft extends MovingEntity {
 		
 	}
 	
+	
+/*  // Loop evasion does not work yet.!! 	
 	private void adjustCurAngle(){
 		 if((int) airDesiredAngle < airCurAngle)
 			airCurAngle += TURNRATE;
 		else if((int)airDesiredAngle > airCurAngle)
 			airCurAngle -= TURNRATE;
-		 
-		// System.out.println("Current Angle is " + airCurAngle);
 	}
 	
 	public double getAngle() { 
-	    double angle = (double) Math.toDegrees(Math.atan2(this.position.x, this.position.y)); 
-	    
+	    //double angle = (double) Math.toDegrees(Math.atan2(this.position.x, this.position.y)); 
+	    //double angle = (double) Math.toDegrees(Math.atan2(pursuer.position.x - position.x, pursuer.position.y - position.y)); 
+		if (angleGet == 0){
+			angle = Missile.desiredAngle;
+			angleGet = 1;
+			angle = -1 * angle;
+		}
+			
 	    System.out.println("Current Angle is " + angle);
 	    
-	    if(angle < 0)
-	        angle += 360; 
+	    //if(angle < 0)
+	      //  angle += 360; 
 	   
-	    return angle - 90; 	
+	    return angle; //- 90; 	
 	}
 	
 	public void Loop()
 	{
 		airCurAngle = getAngle();
-		airDesiredAngle = 180;
+		airDesiredAngle = airCurAngle;
 		adjustCurAngle();
+		//angle = airCurAngle;
 		//velocity = 
 		position.x = position.x + (velocity.x * Math.cos(Math.toRadians(airCurAngle)) * Missile.timeSeconds);
 		position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(airCurAngle));
-		
-		
-	}
+				
+	}*/
 	
 	public void Wave()
 	{
-		// Randomize the evasion technique
-					if (N == 30)
+		// Randomize the wave evasion technique
+					if (N == 40)
 					{
 						//Random rand;//, angle;
 						//rand = new Random();
@@ -282,21 +263,14 @@ public class Aircraft extends MovingEntity {
 						position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(45));
 						if (position.y > 360){
 							position.y = 360;
-							N = 49;
-							//odd = 1;
+							N = 39;
+							odd = 1;
 						}
-
-						//N++;
 					}
 				else 
 					{	
 						position.x = position.x + (velocity.x * Math.cos(Math.toRadians(-45)) * Missile.timeSeconds);
 						position.y = position.y + velocity.y * Missile.timeSeconds * Math.sin(Math.toRadians(-45));
-						//System.out.println("Y position is " + position.y);
-
-						// check for ground
-							
-						//N++;
 					}		
 	}
 
