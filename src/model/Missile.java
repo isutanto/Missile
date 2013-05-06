@@ -65,7 +65,7 @@ public class Missile extends MovingEntity {
 	public ArrayList<Double> speedArray;
 	
 	private static final double MISSED_SPEEDUP = 2.0;
-
+        private static final double MISSED_ANGLE = -255.0;
 	
 	//Equation constants
 	//Lift force
@@ -141,7 +141,8 @@ public class Missile extends MovingEntity {
 
 	}
 	
-/*
+/* // Latest addition from SC ** WARNING will break the functionality of the graph **
+  
 	public void update(MovingEntity target, double delta) {
 		totalTime += delta;
 		timeSeconds = totalTime/1000000000L;
@@ -151,7 +152,7 @@ public class Missile extends MovingEntity {
 		calculateThrust();
 		calculateLift();
 		calculateDrag();
-		calculateWeight(totalTime);
+		calculateWeight();
         //add up, calculate acceleration/position
 		
 		//update array
@@ -175,12 +176,8 @@ public class Missile extends MovingEntity {
 		    
 			//add accelerations to velocity -- (multiply by delta t -- )
 			velocity = velocity.add(accel.mul(delta));
-			
-			
-			//System.out.println("Missile velocity " + velocity);
 			velocity.truncate(this.maxSpeed);
 			
-
 		}else{
 			thrustForce = 0;
 			dragForce = 0;
@@ -284,16 +281,16 @@ public class Missile extends MovingEntity {
 		if(state == State.GROUND || state == State.EXPLODE)
 			velocity.Zero();
 		else if (state == State.ACCEL){
-			System.out.println("Accel State");
+		    //	System.out.println("Accel State");
 			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
 			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle));	
 		}else if (state == State.FREEFALL){
-			System.out.println("FreeFall State");
+		    //	System.out.println("FreeFall State");
 			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
 			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
 		}
 		else if (state == State.MISSED){
-			System.out.println("Missed State");
+		    //	System.out.println("Missed State");
 			//desiredAngle = missile heading and aircraft position
 			double x;
 			double y;
@@ -307,7 +304,7 @@ public class Missile extends MovingEntity {
 			Vector2D w1;
 			//w1 = steering.wander();
 			w1 = steering.myTarget.steering.wander();
-			System.out.println("w1:"+w1);
+			//	System.out.println("w1:"+w1);
 			Vector2D w2;
 		    w2 = w1.sub(position);
 		    w2.normalize();
@@ -318,24 +315,6 @@ public class Missile extends MovingEntity {
 		if(this.distanceToTarget()< engageDist)
 			engage++;
 	}
-	
-	
-/*
-	private void updatePosition() {
-		if(state == State.GROUND || state == State.EXPLODE || state == State.SELFDESTRUCT)
-			velocity.Zero();
-		else if (state == State.ACCEL){
-			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
-			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle));
-		}else if (state == State.FREEFALL){
-			position.y = position.y + velocity.y * timeSeconds * Math.sin(Math.toRadians(curAngle)) + .5 * .098 * timeSeconds*timeSeconds;
-			position.x = position.x + (velocity.x * Math.cos(Math.toRadians(curAngle)) * timeSeconds);
-		}
-	
-		if(this.distanceToTarget()< engageDist)
-			engage++;
-		
-	}*/
 	
 
 	private void getDesiredAngle() {
@@ -367,10 +346,15 @@ public class Missile extends MovingEntity {
 	
 	public double getAngle(Vector2D targetPos) { 
 	    double angle = (double) Math.toDegrees(Math.atan2(targetPos.x - position.x, targetPos.y - position.y)); 
-	 
+	    /* // original
 	    if(angle < 0)
-	        angle += 360; 
-	   
+	    angle += 360;*/
+
+	    // SC Update to recalculate target positon
+	    if (angle-90 < MISSED_ANGLE){
+		state = State.MISSED;
+	    }
+
 	    return angle - 90; 
 	
 	}
@@ -421,19 +405,6 @@ public class Missile extends MovingEntity {
 			
 	}
 	
-/*
-	private void updateState(double timeSeconds) {
-		if(timeSeconds < BURNOUT)
-			state = State.ACCEL;
-		else if (state != State.EXPLODE)
-			state = State.FREEFALL;
-		if(position.y >= GameWorldModel.GROUND.y)
-			state = State.GROUND;
-		
-			
-	}*/
-
-
 	private void calculateLift() {
 		lift = velocity.sq();	// V sqr
 		lift = lift.mul(rho);	// p * V2
@@ -480,6 +451,9 @@ public class Missile extends MovingEntity {
 		double temp = (Gc * u)/g;
 		temp += Pf*Sb;
 		thrust = new Vector2D(temp, -temp);
+
+		// SC update
+		thrust.mul(temp);
 	}
 		
 	
@@ -518,7 +492,8 @@ public class Missile extends MovingEntity {
 		
 	}
 
-
+    
+    // Revert back the function for position is updated with the live graph
 	public void dragMissile() {
 		//position.x = MouseInfo.getPointerInfo().getLocation().x;		
 	}
@@ -530,7 +505,7 @@ public class Missile extends MovingEntity {
 
 	public double getSpeed()
 	{
-       return velocity.length();
+	    return velocity.length();
 	}
 
 }

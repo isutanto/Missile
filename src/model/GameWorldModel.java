@@ -257,4 +257,3 @@ public int getMapX(){ return MAPX;}
 public int getMapY(){ return MAPY;}
 }
 
-

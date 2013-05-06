@@ -191,7 +191,9 @@ public class SteeringBehaviors {
 		//and steer towards it
 		//return newTarget.sub(entity.pos());
 		//System.out.println("NewTarget: "+newTarget);
-		return newTarget.mul(-1);
+		newTarget = newTarget.mul(-1);
+		return newTarget;
+		//return newTarget.mul(-1);
 	}
 	
 	public Vector2D aircraftwander() 
@@ -323,7 +325,7 @@ public class SteeringBehaviors {
 		this.entity = (Missile) subject;
 		target = new Vector2D();
 		steeringForce = new Vector2D();
-		wanderDistance				= wanderDist;
+		wanderDistance		                = wanderDist;
 		wanderDistanceCpy           = 5.0;
 		wanderJitter				= wanderJitterPerSec;
 		wanderJitterCpy             = 3.0;
@@ -372,11 +374,11 @@ public class SteeringBehaviors {
 		this.aircraft_entity = aircraft; 	
 		
 		wanderDistance				= wanderDist;
-		wanderDistanceCpy           = 5.0;
+		wanderDistanceCpy           =26.0; // 5.0;
 		wanderJitter				= wanderJitterPerSec;
-		wanderJitterCpy             = 3.0;
+		wanderJitterCpy             = 1.0; // 3.0;
 		wanderRadius				= wanderRad;
-		wanderRadiusCpy             = 1.0;
+		wanderRadiusCpy             = 5.0; // 1.0;
 		
 		double theta = Math.random() * (2* Math.PI);
 		
